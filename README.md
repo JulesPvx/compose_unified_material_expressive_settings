@@ -19,7 +19,7 @@ Next, add the dependency to your app module's build.gradle.kts file:
 
 ```Kotlin
 dependencies {
-    implementation("com.github.JulesPvx:compose_unified_material_expressive_settings:1.0.0")
+    implementation("com.github.JulesPvx:compose_unified_material_expressive_settings:1.0.1")
 }
 ```
 
