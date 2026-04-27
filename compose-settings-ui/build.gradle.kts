@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     id("maven-publish")
 }
@@ -13,11 +13,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "fr.paeelluu.compose_settings_ui"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -62,7 +58,7 @@ afterEvaluate {
 
                 groupId = "com.github.JulesPvx"
                 artifactId = "compose-settings-ui"
-                version = "1.0.0"
+                version = libs.versions.libraryVersion.get()
             }
         }
     }

@@ -1,0 +1,43 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version number (e.g., 1.0.1)'
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update Version in TOML
+        run: |
+          sed -i 's/libraryVersion = "[^"]*"/libraryVersion = "${{ inputs.version }}"/' gradle/libs.versions.toml
+
+      - name: Update Version in README
+        run: |
+          sed -i 's/compose_unified_material_expressive_settings:[^"]*"/compose_unified_material_expressive_settings:${{ inputs.version }}"/' README.md
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add gradle/libs.versions.toml README.md
+          git commit -m "chore: bump version to ${{ inputs.version }}"
+          git push
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ inputs.version }} \
+            --title "Release ${{ inputs.version }}" \
+            --generate-notes

@@ -8,6 +8,7 @@ kotlin = "2.3.21"
 composeBom = "2026.04.01"
 material = "1.13.0"
 appcompat = "1.7.1"
+libraryVersion = "1.0.0"
 
 [libraries]
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
@@ -22,4 +23,5 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
