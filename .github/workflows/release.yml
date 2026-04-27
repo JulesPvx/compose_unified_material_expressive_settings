@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'New version number (e.g., 1.0.1)'
-        required: true
+        description: 'Override: New version to bump to (e.g., 1.0.2). Leave empty to just release the current version from TOML.'
+        required: false
         type: string
 
 jobs:
@@ -18,26 +18,53 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Update Version in TOML
+      - name: Determine Target Version
+        id: version_logic
         run: |
-          sed -i 's/libraryVersion = "[^"]*"/libraryVersion = "${{ inputs.version }}"/' gradle/libs.versions.toml
+          CURRENT_VERSION=$(grep -oP '(?<=libraryVersion = ")[^"]*' gradle/libs.versions.toml)
+          echo "Current version in TOML: $CURRENT_VERSION"
+          
+          INPUT_VERSION="${{ inputs.version }}"
+          
+          if [ -n "$INPUT_VERSION" ]; then
+            echo "Input provided. Validating bump to: $INPUT_VERSION"
+            if dpkg --compare-versions "$CURRENT_VERSION" ge "$INPUT_VERSION"; then
+              echo "::error::Version bump failed. The override version ($INPUT_VERSION) must be strictly greater than the current version ($CURRENT_VERSION)."
+              exit 1
+            fi
+            echo "TARGET_VERSION=$INPUT_VERSION" >> $GITHUB_ENV
+            echo "SHOULD_BUMP=true" >> $GITHUB_ENV
+          else
+            echo "No override provided. Using current version."
+            echo "TARGET_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+            echo "SHOULD_BUMP=false" >> $GITHUB_ENV
+          fi
 
-      - name: Update Version in README
+      - name: Update Versions in Project Files
+        if: env.SHOULD_BUMP == 'true'
         run: |
-          sed -i 's/compose_unified_material_expressive_settings:[^"]*"/compose_unified_material_expressive_settings:${{ inputs.version }}"/' README.md
+          # Update libraryVersion in gradle/libs.versions.toml
+          sed -i -E "s/(libraryVersion = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" gradle/libs.versions.toml
+          
+          # Update Version Catalog reference in README.md
+          sed -i -E "s/(composeSettings = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
+          
+          # Update Standard Dependency string in README.md
+          sed -i -E "s/(compose_unified_material_expressive_settings:)[0-9]+\.[0-9]+\.[0-9]+/\1${{ env.TARGET_VERSION }}/" README.md
 
       - name: Commit and Push Changes
+        if: env.SHOULD_BUMP == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add gradle/libs.versions.toml README.md
-          git commit -m "chore: bump version to ${{ inputs.version }}"
+          git commit -m "chore: bump version to ${{ env.TARGET_VERSION }}"
           git push
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ inputs.version }} \
-            --title "Release ${{ inputs.version }}" \
+          gh release create ${{ env.TARGET_VERSION }} \
+            --title "Release ${{ env.TARGET_VERSION }}" \
             --generate-notes
