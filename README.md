@@ -1,6 +1,6 @@
-# Compose Settings UI
+# Compose Unified Material Expressive Settings UI
 
-A minimalist Jetpack Compose library for building grouped settings screens. It dynamically calculates corner radii to create visually distinct groups of settings items, automatically inheriting your app's Material 3 theme.
+A minimalist Jetpack Compose library for building grouped settings screens. It dynamically calculates corner radius to create visually distinct groups of settings items, automatically inheriting your app's Material 3 theme.
 
 ## Installation
 
