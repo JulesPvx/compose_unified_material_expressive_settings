@@ -15,19 +15,24 @@
 
 package fr.paeelluu.compose_settings_ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +42,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 public interface SettingsSectionScope {
@@ -58,14 +72,79 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null
     )
 
-    public fun selector(
+    public fun <T> selector(
         title: String,
-        options: List<String>,
-        selectedOption: String,
-        onOptionSelected: (String) -> Unit,
+        options: List<T>,
+        selectedOption: T,
+        onOptionSelected: (T) -> Unit,
+        displayText: (T) -> String = { it.toString() },
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null
     )
+}
+
+/**
+ * Custom Shape that smoothly animates the bottom corners of the header
+ * towards a 4.dp radius when expanded, maintaining the top corners.
+ */
+private class SelectorHeaderShape(
+    private val baseShape: RoundedCornerShape,
+    private val fraction: Float
+) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val innerCornerPx = with(density) { 4.dp.toPx() }
+
+        val topStart = baseShape.topStart.toPx(size, density)
+        val topEnd = baseShape.topEnd.toPx(size, density)
+        val originalBottomStart = baseShape.bottomStart.toPx(size, density)
+        val originalBottomEnd = baseShape.bottomEnd.toPx(size, density)
+
+        val currentBottomStart = originalBottomStart + (innerCornerPx - originalBottomStart) * fraction
+        val currentBottomEnd = originalBottomEnd + (innerCornerPx - originalBottomEnd) * fraction
+
+        return Outline.Rounded(
+            RoundRect(
+                rect = Rect(0f, 0f, size.width, size.height),
+                topLeft = CornerRadius(topStart, topStart),
+                topRight = CornerRadius(topEnd, topEnd),
+                bottomRight = CornerRadius(currentBottomEnd, currentBottomEnd),
+                bottomLeft = CornerRadius(currentBottomStart, currentBottomStart)
+            )
+        )
+    }
+}
+
+private class SelectorOptionsShape(
+    private val baseShape: RoundedCornerShape,
+    private val fraction: Float
+) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val innerCornerPx = with(density) { 4.dp.toPx() }
+
+        val originalBottomStart = baseShape.bottomStart.toPx(size, density)
+        val originalBottomEnd = baseShape.bottomEnd.toPx(size, density)
+
+        val currentTopStart = originalBottomStart + (innerCornerPx - originalBottomStart) * fraction
+        val currentTopEnd = originalBottomEnd + (innerCornerPx - originalBottomEnd) * fraction
+
+        return Outline.Rounded(
+            RoundRect(
+                rect = Rect(0f, 0f, size.width, size.height),
+                topLeft = CornerRadius(currentTopStart, currentTopStart),
+                topRight = CornerRadius(currentTopEnd, currentTopEnd),
+                bottomRight = CornerRadius(originalBottomEnd, originalBottomEnd),
+                bottomLeft = CornerRadius(originalBottomStart, originalBottomStart)
+            )
+        )
+    }
 }
 
 internal class SettingsSectionScopeImpl : SettingsSectionScope {
@@ -111,58 +190,115 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         }
     }
 
-    override fun selector(
+    override fun <T> selector(
         title: String,
-        options: List<String>,
-        selectedOption: String,
-        onOptionSelected: (String) -> Unit,
+        options: List<T>,
+        selectedOption: T,
+        onOptionSelected: (T) -> Unit,
+        displayText: (T) -> String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?
     ) {
         items.add { shape ->
             var expanded by remember { mutableStateOf(false) }
 
-            SettingsItemBase(
-                title = title,
-                subtitle = subtitle,
-                shape = shape,
-                leadingContent = icon,
-                onClick = { expanded = true },
-                trailingContent = {
-                    Box {
+            val expandedFraction by animateFloatAsState(
+                targetValue = if (expanded) 1f else 0f,
+                label = "expanded_fraction"
+            )
+
+            val arrowRotation = expandedFraction * 180f
+
+            val baseShape = shape as? RoundedCornerShape ?: RoundedCornerShape(4.dp)
+            val innerCorner = CornerSize(4.dp)
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                val headerShape = remember(baseShape, expandedFraction) {
+                    SelectorHeaderShape(baseShape, expandedFraction)
+                }
+
+                val optionsContainerShape = remember(baseShape, expandedFraction) {
+                    SelectorOptionsShape(baseShape, expandedFraction)
+                }
+
+                SettingsItemBase(
+                    title = title,
+                    subtitle = subtitle,
+                    shape = headerShape,
+                    leadingContent = icon,
+                    onClick = { expanded = !expanded },
+                    trailingContent = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                text = selectedOption,
+                                text = displayText(selectedOption),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = "Expand options",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.rotate(arrowRotation)
                             )
                         }
+                    }
+                )
 
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            options.forEach { option ->
-                                DropdownMenuItem(
-                                    text = { Text(option) },
-                                    onClick = {
-                                        onOptionSelected(option)
-                                        expanded = false
-                                    }
+                AnimatedVisibility(
+                    visible = expanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
+                    modifier = Modifier.clip(optionsContainerShape)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        options.forEachIndexed { index, option ->
+                            val isSelected = option == selectedOption
+                            val isLast = index == options.lastIndex
+
+                            val optionShape = if (isLast) {
+                                RoundedCornerShape(
+                                    topStart = innerCorner,
+                                    topEnd = innerCorner,
+                                    bottomStart = baseShape.bottomStart,
+                                    bottomEnd = baseShape.bottomEnd
                                 )
+                            } else {
+                                RoundedCornerShape(innerCorner)
                             }
+
+                            SettingsItemBase(
+                                title = displayText(option),
+                                shape = optionShape,
+                                onClick = {
+                                    onOptionSelected(option)
+                                    expanded = false
+                                },
+                                leadingContent = {
+                                    Spacer(modifier = Modifier.width(24.dp))
+                                },
+                                trailingContent = {
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Selected",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            )
                         }
                     }
                 }
-            )
+            }
         }
     }
 }
