@@ -58,4 +58,12 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null
     )
+
+    public fun keywordEditor(
+        title: String,
+        placeholder: String,
+        keywords: List<String>,
+        onAdd: (String) -> Unit,
+        onRemove: (String) -> Unit
+    )
 }

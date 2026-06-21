@@ -279,4 +279,30 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
             }
         }
     }
+
+    override fun keywordEditor(
+        title: String,
+        placeholder: String,
+        keywords: List<String>,
+        onAdd: (String) -> Unit,
+        onRemove: (String) -> Unit
+    ) {
+        items.add { shape ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape),
+                color = MaterialTheme.colorScheme.surfaceContainer
+            ) {
+                KeywordEditor(
+                    title = title,
+                    placeholder = placeholder,
+                    keywords = keywords,
+                    onAdd = onAdd,
+                    onRemove = onRemove,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                )
+            }
+        }
+    }
 }
