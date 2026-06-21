@@ -51,7 +51,9 @@ public interface SettingsSectionScope {
         label: String? = null,
         placeholder: String? = null,
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        isError: Boolean = false,
+        supportingText: String? = null
     )
 
     public fun link(
@@ -103,6 +105,80 @@ public interface SettingsSectionScope {
         displayText: (T) -> String = { it.toString() },
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun <T> dialogSelector(
+        title: String,
+        options: List<T>,
+        selectedOption: T,
+        onOptionSelected: (T) -> Unit,
+        displayText: (T) -> String = { it.toString() },
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun <T> radioButtonGroup(
+        options: List<T>,
+        selectedOption: T,
+        onOptionSelected: (T) -> Unit,
+        displayText: (T) -> String = { it.toString() }
+    )
+
+    public fun <T> multiSelectList(
+        options: List<T>,
+        selectedOptions: Set<T>,
+        onSelectionChange: (Set<T>) -> Unit,
+        displayText: (T) -> String = { it.toString() }
+    )
+
+    public fun rangeSlider(
+        title: String,
+        value: ClosedFloatingPointRange<Float>,
+        onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
+        valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+        steps: Int = 0,
+        valueLabel: (Float) -> String = { it.toString() },
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun timePicker(
+        title: String,
+        hour: Int,
+        minute: Int,
+        onTimeSelected: (hour: Int, minute: Int) -> Unit,
+        is24Hour: Boolean = true,
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun datePicker(
+        title: String,
+        selectedDateMillis: Long?,
+        onDateSelected: (Long?) -> Unit,
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun colorPicker(
+        title: String,
+        selectedColor: androidx.compose.ui.graphics.Color,
+        onColorSelected: (androidx.compose.ui.graphics.Color) -> Unit,
+        colors: List<androidx.compose.ui.graphics.Color> = emptyList(),
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun footer(text: String)
+
+    public fun loading(title: String, subtitle: String? = null)
+
+    public fun subHeader(text: String)
+
+    public fun searchBar(
+        query: String,
+        onQueryChange: (String) -> Unit,
+        placeholder: String = "Search settings..."
     )
 
     public fun slider(

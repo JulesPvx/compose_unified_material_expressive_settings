@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -140,7 +141,7 @@ private fun KeywordEditorPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "4. Full Section (Grouped Shapes)", heightDp = 1000)
+@Preview(showBackground = true, name = "4. Full Section (Grouped Shapes)", heightDp = 3000)
 @Composable
 fun FullSettingsScreenPreview() {
     var bluetoothEnabled by remember { mutableStateOf(true) }
@@ -149,7 +150,13 @@ fun FullSettingsScreenPreview() {
     var displayName by remember { mutableStateOf("Jules") }
     var keepScreenOn by remember { mutableStateOf(false) }
     var selectedTheme by remember { mutableStateOf("System Default") }
-    var maxConnections by remember { mutableStateOf(3) }
+    var maxConnections by remember { mutableIntStateOf(3) }
+    var selectedLanguage by remember { mutableStateOf("English") }
+    var notificationsEnabled by remember { mutableStateOf(setOf("Email", "Push")) }
+    var searchPath by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf<Long?>(null) }
+    var selectedColor by remember { mutableStateOf(Color(0xFF6E7FDC)) }
+    var connectionRange by remember { mutableStateOf(0.2f..0.8f) }
 
     MaterialTheme {
         Surface(
@@ -162,11 +169,28 @@ fun FullSettingsScreenPreview() {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
+                SettingsSection(title = "Search") {
+                    searchBar(
+                        query = searchPath,
+                        onQueryChange = { searchPath = it },
+                        placeholder = "Search for a setting..."
+                    )
+                }
+
                 SettingsSection(title = "Account") {
                     userProfile(
                         name = "Jules Pouvreaux",
                         email = "jules@example.com",
                         onClick = {}
+                    )
+                    
+                    textField(
+                        title = "Display Name",
+                        value = displayName,
+                        onValueChange = { displayName = it },
+                        placeholder = "Enter your name",
+                        isError = displayName.isEmpty(),
+                        supportingText = if (displayName.isEmpty()) "Name cannot be empty" else null
                     )
                 }
 
@@ -179,20 +203,20 @@ fun FullSettingsScreenPreview() {
                         icon = { Icon(Icons.Default.Bluetooth, contentDescription = null) }
                     )
 
-                    selector(
-                        title = "Advertising Power",
-                        subtitle = "Balanced mode recommended",
-                        options = listOf(0, 1, 2),
-                        selectedOption = selectedPowerMode,
-                        displayText = { mode ->
-                            when (mode) {
-                                0 -> "Low Power"
-                                1 -> "Balanced"
-                                2 -> "Low Latency"
-                                else -> "Unknown"
-                            }
-                        },
-                        onOptionSelected = { selectedPowerMode = it }
+                    dialogSelector(
+                        title = "Language",
+                        options = listOf("English", "French", "Spanish", "German", "Japanese", "Chinese"),
+                        selectedOption = selectedLanguage,
+                        onOptionSelected = { selectedLanguage = it }
+                    )
+
+                    subHeader(text = "Advanced Connectivity")
+                    
+                    rangeSlider(
+                        title = "Signal Strength Range",
+                        value = connectionRange,
+                        onValueChange = { connectionRange = it },
+                        valueLabel = { "${(it * 100).toInt()}%" }
                     )
                 }
 
@@ -203,20 +227,34 @@ fun FullSettingsScreenPreview() {
                         onOptionSelected = { selectedTheme = it }
                     )
                     
+                    colorPicker(
+                        title = "Accent Color",
+                        subtitle = "Choose your favorite color",
+                        selectedColor = selectedColor,
+                        onColorSelected = { selectedColor = it }
+                    )
+
                     slider(
-                        title = "Brightness",
+                        title = "Volume",
                         value = volume,
                         onValueChange = { volume = it },
                         icon = { Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null) }
                     )
                 }
 
-                SettingsSection(title = "Profile") {
-                    textField(
-                        title = "Display Name",
-                        value = displayName,
-                        onValueChange = { displayName = it },
-                        placeholder = "Enter your name"
+                SettingsSection(title = "Preferences") {
+                    subHeader(text = "Notifications")
+                    multiSelectList(
+                        options = listOf("Email", "Push", "SMS", "Desktop"),
+                        selectedOptions = notificationsEnabled,
+                        onSelectionChange = { notificationsEnabled = it }
+                    )
+
+                    subHeader(text = "Schedule")
+                    datePicker(
+                        title = "Sync Date",
+                        selectedDateMillis = selectedDate,
+                        onDateSelected = { selectedDate = it }
                     )
                     
                     stepper(
@@ -236,37 +274,41 @@ fun FullSettingsScreenPreview() {
                     )
 
                     expandableGroup(
-                        title = "Advanced Settings",
+                        title = "Help & Support",
                         icon = { Icon(Icons.Default.Notifications, contentDescription = null) }
                     ) {
-                        switch(
-                            title = "Developer Mode",
-                            checked = false,
-                            onCheckedChange = {}
+                        link(
+                            title = "Documentation",
+                            onClick = {}
                         )
-                        action(
-                            title = "Reset to Factory Settings",
+                        link(
+                            title = "Community Forum",
                             onClick = {}
                         )
                     }
 
+                    loading(title = "System Update", subtitle = "Checking for updates...")
+
                     info(
-                        text = "Your device is up to date. Last checked 2 hours ago."
+                        text = "Your device is secured by biometric authentication."
                     )
 
                     link(
-                        title = "About Adunatio",
-                        subtitle = "Version 1.0.2",
+                        title = "Legal Information",
                         onClick = {},
                         icon = { Icon(Icons.AutoMirrored.Filled.Help, contentDescription = null) }
                     )
 
                     action(
-                        title = "Clear Cache",
-                        subtitle = "Frees up 124 MB",
+                        title = "Factory Reset",
+                        subtitle = "This will erase all data",
                         icon = { Icon(Icons.Default.Storage, contentDescription = null) },
                         onClick = {}
                     )
+                }
+                
+                SettingsSection(title = "About") {
+                    footer(text = "Version 1.0.8 (Alpha)\n© 2026 Jules Pouvreaux Labs")
                 }
             }
         }

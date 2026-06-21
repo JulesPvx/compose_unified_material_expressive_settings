@@ -4,18 +4,29 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,20 +35,40 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.TimeToLeave
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonColors
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,13 +78,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.paeelluu.compose_settings_ui.components.KeywordEditor
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 internal class SettingsSectionScopeImpl : SettingsSectionScope {
     internal val items = mutableListOf<@Composable (Shape) -> Unit>()
@@ -124,7 +160,9 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         label: String?,
         placeholder: String?,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        isError: Boolean,
+        supportingText: String?
     ) {
         items.add { shape ->
             Surface(
@@ -167,6 +205,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                         onValueChange = onValueChange,
                         label = label?.let { { Text(it) } },
                         placeholder = placeholder?.let { { Text(it) } },
+                        isError = isError,
+                        supportingText = supportingText?.let { { Text(it) } },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp)
@@ -233,8 +273,15 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                                 options.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
                                 else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                             },
+                            colors = ToggleButtonDefaults.toggleButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                checkedContainerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
                             modifier = Modifier
                                 .semantics { role = Role.RadioButton }
+                                .fillMaxRowHeight()
                                 .weight(1f),
                         ) {
                             Text(
@@ -471,7 +518,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                             Text(
                                 text = displayText(selectedOption),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Center
                             )
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
@@ -531,6 +579,478 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun <T> dialogSelector(
+        title: String,
+        options: List<T>,
+        selectedOption: T,
+        onOptionSelected: (T) -> Unit,
+        displayText: (T) -> String,
+        subtitle: String?,
+        icon: (@Composable () -> Unit)?
+    ) {
+        items.add { shape ->
+            var showDialog by remember { mutableStateOf(false) }
+
+            SettingsItemBase(
+                title = title,
+                subtitle = subtitle ?: displayText(selectedOption),
+                shape = shape,
+                leadingContent = icon,
+                onClick = { showDialog = true },
+                trailingContent = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            )
+
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text(text = title) },
+                    text = {
+                        LazyColumn {
+                            items(options) { option ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            onOptionSelected(option)
+                                            showDialog = false
+                                        }
+                                        .padding(vertical = 12.dp, horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    RadioButton(
+                                        selected = option == selectedOption,
+                                        onClick = null
+                                    )
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Text(
+                                        text = displayText(option),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showDialog = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    override fun <T> radioButtonGroup(
+        options: List<T>,
+        selectedOption: T,
+        onOptionSelected: (T) -> Unit,
+        displayText: (T) -> String
+    ) {
+        items.add { shape ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape),
+                color = MaterialTheme.colorScheme.surfaceContainer
+            ) {
+                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    options.forEach { option ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onOptionSelected(option) }
+                                .padding(horizontal = 24.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = option == selectedOption,
+                                onClick = null
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = displayText(option),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun <T> multiSelectList(
+        options: List<T>,
+        selectedOptions: Set<T>,
+        onSelectionChange: (Set<T>) -> Unit,
+        displayText: (T) -> String
+    ) {
+        items.add { shape ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape),
+                color = MaterialTheme.colorScheme.surfaceContainer
+            ) {
+                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    options.forEach { option ->
+                        val isChecked = selectedOptions.contains(option)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val newSelection = if (isChecked) {
+                                        selectedOptions - option
+                                    } else {
+                                        selectedOptions + option
+                                    }
+                                    onSelectionChange(newSelection)
+                                }
+                                .padding(horizontal = 24.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = null
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = displayText(option),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun rangeSlider(
+        title: String,
+        value: ClosedFloatingPointRange<Float>,
+        onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
+        valueRange: ClosedFloatingPointRange<Float>,
+        steps: Int,
+        valueLabel: (Float) -> String,
+        subtitle: String?,
+        icon: (@Composable () -> Unit)?
+    ) {
+        items.add { shape ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape),
+                color = MaterialTheme.colorScheme.surfaceContainer
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (icon != null) {
+                            Box(modifier = Modifier.padding(end = 16.dp)) {
+                                icon()
+                            }
+                        }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            if (subtitle != null) {
+                                Text(
+                                    text = subtitle,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Text(
+                            text = "${valueLabel(value.start)} - ${valueLabel(value.endInclusive)}",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
+
+                    RangeSlider(
+                        value = value,
+                        onValueChange = onValueChange,
+                        valueRange = valueRange,
+                        steps = steps,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun timePicker(
+        title: String,
+        hour: Int,
+        minute: Int,
+        onTimeSelected: (hour: Int, minute: Int) -> Unit,
+        is24Hour: Boolean,
+        subtitle: String?,
+        icon: (@Composable () -> Unit)?
+    ) {
+        items.add { shape ->
+            var showDialog by remember { mutableStateOf(false) }
+            val timePickerState = rememberTimePickerState(
+                initialHour = hour,
+                initialMinute = minute,
+                is24Hour = is24Hour
+            )
+
+            SettingsItemBase(
+                title = title,
+                subtitle = subtitle ?: String.format("%02d:%02d", hour, minute),
+                shape = shape,
+                leadingContent = icon,
+                onClick = { showDialog = true },
+                trailingContent = {
+                    Icon(Icons.Default.TimeToLeave, contentDescription = null)
+                }
+            )
+
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onTimeSelected(timePickerState.hour, timePickerState.minute)
+                            showDialog = false
+                        }) { Text("OK") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+                    },
+                    title = { Text(title) },
+                    text = { TimePicker(state = timePickerState) }
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun datePicker(
+        title: String,
+        selectedDateMillis: Long?,
+        onDateSelected: (Long?) -> Unit,
+        subtitle: String?,
+        icon: (@Composable () -> Unit)?
+    ) {
+        items.add { shape ->
+            var showDialog by remember { mutableStateOf(false) }
+            val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDateMillis)
+            val formatter = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
+
+            SettingsItemBase(
+                title = title,
+                subtitle = subtitle ?: selectedDateMillis?.let { formatter.format(Date(it)) } ?: "Select date",
+                shape = shape,
+                leadingContent = icon,
+                onClick = { showDialog = true },
+                trailingContent = {
+                    Icon(Icons.Default.DateRange, contentDescription = null)
+                }
+            )
+
+            if (showDialog) {
+                DatePickerDialog(
+                    onDismissRequest = { showDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onDateSelected(datePickerState.selectedDateMillis)
+                            showDialog = false
+                        }) { Text("OK") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
+        }
+    }
+
+    override fun colorPicker(
+        title: String,
+        selectedColor: Color,
+        onColorSelected: (Color) -> Unit,
+        colors: List<Color>,
+        subtitle: String?,
+        icon: (@Composable () -> Unit)?
+    ) {
+        items.add { shape ->
+            var showDialog by remember { mutableStateOf(false) }
+            val defaultColors = remember {
+                listOf(
+                    Color.Red, Color.Blue, Color.Green, Color.Yellow,
+                    Color.Cyan, Color.Magenta, Color.Black, Color.Gray,
+                    Color(0xFF6200EE), Color(0xFF03DAC5), Color(0xFFFF5722), Color(0xFFE91E63)
+                )
+            }
+            val displayColors = colors.ifEmpty { defaultColors }
+
+            SettingsItemBase(
+                title = title,
+                subtitle = subtitle,
+                shape = shape,
+                leadingContent = icon,
+                onClick = { showDialog = true },
+                trailingContent = {
+                    Surface(
+                        modifier = Modifier.size(24.dp),
+                        shape = CircleShape,
+                        color = selectedColor,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                    ) {}
+                }
+            )
+
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Select Color") },
+                    text = {
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(48.dp),
+                            contentPadding = PaddingValues(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(displayColors) { color ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .aspectRatio(1f)
+                                        .clip(CircleShape)
+                                        .background(color)
+                                        .clickable {
+                                            onColorSelected(color)
+                                            showDialog = false
+                                        }
+                                        .then(
+                                            if (color == selectedColor) Modifier.background(
+                                                color.copy(alpha = 0.5f),
+                                                CircleShape
+                                            ) else Modifier
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (color == selectedColor) {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = if (color == Color.White) Color.Black else Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showDialog = false }) { Text("Close") }
+                    }
+                )
+            }
+        }
+    }
+
+    override fun footer(text: String) {
+        items.add { _ ->
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+
+    override fun loading(title: String, subtitle: String?) {
+        items.add { shape ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape),
+                color = MaterialTheme.colorScheme.surfaceContainer
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(title, style = MaterialTheme.typography.titleMedium)
+                            if (subtitle != null) {
+                                Text(subtitle, style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+            }
+        }
+    }
+
+    override fun subHeader(text: String) {
+        items.add { _ ->
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+            )
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun searchBar(query: String, onQueryChange: (String) -> Unit, placeholder: String) {
+        items.add { shape ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .clip(shape)
+            ) {
+                SearchBar(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    onSearch = {},
+                    active = false,
+                    onActiveChange = {},
+                    placeholder = { Text(placeholder) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = SearchBarDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                    )
+                ) {}
             }
         }
     }
