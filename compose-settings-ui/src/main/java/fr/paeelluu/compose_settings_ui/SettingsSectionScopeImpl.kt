@@ -412,7 +412,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
     override fun expandableGroup(
         title: String,
         icon: (@Composable () -> Unit)?,
-        content: @Composable SettingsSectionScope.() -> Unit
+        content: SettingsSectionScope.() -> Unit
     ) {
         items.add { shape ->
             var expanded by remember { mutableStateOf(false) }
@@ -450,9 +450,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                     enter = expandVertically(),
                     exit = shrinkVertically()
                 ) {
-                    val innerScope = remember { SettingsSectionScopeImpl() }
-                    innerScope.items.clear()
-                    innerScope.content()
+                    val innerScope = SettingsSectionScopeImpl().apply(content)
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
