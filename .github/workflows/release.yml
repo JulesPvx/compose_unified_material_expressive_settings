@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Override: New version to bump to (e.g., 1.0.2). Leave empty to just release the current version from TOML.'
+        description: 'Override: New version to bump to (e.g., 1.0.2). Leave empty to release current TOML version.'
         required: false
         type: string
 
@@ -17,6 +17,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
 
       - name: Determine Target Version
         id: version_logic
@@ -43,13 +49,8 @@ jobs:
       - name: Update Versions in Project Files
         if: env.SHOULD_BUMP == 'true'
         run: |
-          # Update libraryVersion in gradle/libs.versions.toml
           sed -i -E "s/(libraryVersion = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" gradle/libs.versions.toml
-          
-          # Update Version Catalog reference in README.md
           sed -i -E "s/(composeSettings = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
-          
-          # Update Standard Dependency string in README.md
           sed -i -E "s/(compose_unified_material_expressive_settings:)[0-9]+\.[0-9]+\.[0-9]+/\1${{ env.TARGET_VERSION }}/" README.md
 
       - name: Commit and Push Changes
@@ -60,6 +61,15 @@ jobs:
           git add gradle/libs.versions.toml README.md
           git commit -m "chore: bump version to ${{ env.TARGET_VERSION }}"
           git push
+
+      - name: Publish to Maven Central
+        run: ./gradlew publishAllPublicationsToMavenCentralRepository
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSWORD }}
 
       - name: Create GitHub Release
         env:

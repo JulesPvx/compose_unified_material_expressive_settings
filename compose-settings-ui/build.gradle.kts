@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
-    id("maven-publish")
+    id("com.vanniktech.maven.publish")
 }
 
 android {
@@ -12,7 +12,6 @@ android {
 
     defaultConfig {
         minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,11 +24,14 @@ android {
             )
         }
     }
+
     publishing {
         singleVariant("release") {
-            // withSourcesJar() // Optional: Uncomment if you want people to see your source code in Android Studio
+            withSourcesJar()
+            withJavadocJar()
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -49,16 +51,33 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from(components["release"])
+mavenPublishing {
+    coordinates("io.github.julespvx", "compose-settings-ui", libs.versions.libraryVersion.get())
 
-                groupId = "com.github.JulesPvx"
-                artifactId = "compose-settings-ui"
-                version = libs.versions.libraryVersion.get()
+    pom {
+        name.set("Compose Settings UI")
+        description.set("A simple UI library for Jetpack Compose settings screens.")
+        url.set("https://github.com/JulesPvx/compose-settings-ui")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
+        developers {
+            developer {
+                id.set("JulesPvx")
+                name.set("JulesPvx")
+            }
+        }
+        scm {
+            connection.set("scm:git:github.com/JulesPvx/compose-settings-ui.git")
+            developerConnection.set("scm:git:ssh://github.com/JulesPvx/compose-settings-ui.git")
+            url.set("https://github.com/JulesPvx/compose-settings-ui")
+        }
     }
+
+    publishToMavenCentral()
+
+    signAllPublications()
 }
