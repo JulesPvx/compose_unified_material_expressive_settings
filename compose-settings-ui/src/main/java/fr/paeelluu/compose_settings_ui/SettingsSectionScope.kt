@@ -36,6 +36,65 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null
     )
 
+    public fun checkbox(
+        title: String,
+        checked: Boolean,
+        onCheckedChange: (Boolean) -> Unit,
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun textField(
+        title: String,
+        value: String,
+        onValueChange: (String) -> Unit,
+        label: String? = null,
+        placeholder: String? = null,
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun link(
+        title: String,
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null,
+        onClick: () -> Unit
+    )
+
+    public fun <T> segmentedButton(
+        options: List<T>,
+        selectedOption: T,
+        onOptionSelected: (T) -> Unit,
+        displayText: (T) -> String = { it.toString() }
+    )
+
+    public fun stepper(
+        title: String,
+        value: Int,
+        onValueChange: (Int) -> Unit,
+        valueRange: IntRange = 0..10,
+        subtitle: String? = null,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun info(
+        text: String,
+        icon: (@Composable () -> Unit)? = null
+    )
+
+    public fun userProfile(
+        name: String,
+        email: String,
+        avatar: (@Composable () -> Unit)? = null,
+        onClick: (() -> Unit)? = null
+    )
+
+    public fun expandableGroup(
+        title: String,
+        icon: (@Composable () -> Unit)? = null,
+        content: SettingsSectionScope.() -> Unit
+    )
+
     public fun <T> selector(
         title: String,
         options: List<T>,
