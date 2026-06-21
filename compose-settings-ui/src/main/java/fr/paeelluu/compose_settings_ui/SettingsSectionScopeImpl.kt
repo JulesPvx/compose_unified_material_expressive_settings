@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import fr.paeelluu.compose_settings_ui.components.KeywordEditor
 
 internal class SettingsSectionScopeImpl : SettingsSectionScope {
     internal val items = mutableListOf<@Composable (Shape) -> Unit>()

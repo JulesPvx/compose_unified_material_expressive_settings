@@ -110,6 +110,27 @@ private fun SliderItemPreview() {
     }
 }
 
+@Preview(showBackground = true, name = "4. Keyword Editor")
+@Composable
+private fun KeywordEditorPreview() {
+    MaterialTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            SettingsSection(
+                title = "Keyword Editor",
+                modifier = Modifier.padding(16.dp)
+            ) {
+                keywordEditor(
+                    title = "Add Keywords",
+                    keywords = listOf("Compose", "Kotlin", "UI"),
+                    placeholder = "Enter a keyword",
+                    onAdd = {},
+                    onRemove = {}
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true, name = "4. Full Section (Grouped Shapes)", heightDp = 600)
 @Composable
 fun FullSettingsScreenPreview() {
