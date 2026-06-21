@@ -7,9 +7,7 @@ plugins {
 android {
     namespace = "fr.paeelluu.compose_settings_ui"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version = release(37)
     }
 
     defaultConfig {
