@@ -4,51 +4,46 @@ A minimalist Jetpack Compose library for building grouped settings screens. It d
 
 ## Installation
 
-Add JitPack to your project's repository list, typically found in `settings.gradle.kts`:
+This library is hosted on **Maven Central**, meaning you do not need to add any custom repositories to your project. Simply ensure `mavenCentral()` is present in your repository list (usually inside `settings.gradle.kts`):
 
-```Kotlin
+```kotlin
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
     }
 }
-
 ```
 
 ### Using Version Catalogs (Recommended)
 
 Declare the dependency in your `gradle/libs.versions.toml` file:
 
-```Kotlin
+```toml
 [versions]
 composeSettings = "1.0.0"
 
 [libraries]
-compose-settings = { module = "com.github.JulesPvx:compose_unified_material_expressive_settings", version.ref = "composeSettings" }
-
+compose-settings = { module = "io.github.julespvx:compose-settings-ui", version.ref = "composeSettings" }
 ```
 
 Then, add it to your app-level `build.gradle.kts`:
 
-```Kotlin
+```kotlin
 dependencies {
     implementation(libs.compose.settings)
 }
-
 ```
 
 ### Using Standard Dependency Notation
 
-If you are not using version catalogs, add this directly to your app's `build.gradle.kts`:
+If you are not using version catalogs, add this directly to your app-level `build.gradle.kts`:
 
-```Kotlin
+```kotlin
 dependencies {
-    implementation("com.github.JulesPvx:compose_unified_material_expressive_settings:1.0.0")
+    implementation("io.github.julespvx:compose-settings-ui:1.0.0")
 }
-
 ```
 
 ## API Reference
@@ -86,16 +81,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 
 @Composable
 fun SettingsScreen() {
-    var notificationsEnabled by remember { mutableStateOf(true) }
-    var themeOption by remember { mutableIntStateOf(0) }
+var notificationsEnabled by remember { mutableStateOf(true) }
+var themeOption by remember { mutableIntStateOf(0) }
 
     val formatTheme: (Int) -> String = { mode ->
         when (mode) {
@@ -170,4 +165,4 @@ To change the look, simply wrap your UI in your standard app theme.
 
 ## License
 
-This project is open-source and available under the MIT License.
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
