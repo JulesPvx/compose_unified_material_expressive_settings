@@ -741,6 +741,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         title: String,
         value: ClosedFloatingPointRange<Float>,
         onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
+        onValueChangeFinished: (() -> Unit)?,
         valueRange: ClosedFloatingPointRange<Float>,
         steps: Int,
         valueLabel: (Float) -> String,
@@ -793,6 +794,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                     RangeSlider(
                         value = value,
                         onValueChange = onValueChange,
+                        onValueChangeFinished = onValueChangeFinished,
                         valueRange = valueRange,
                         steps = steps,
                         modifier = Modifier
@@ -1059,6 +1061,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         title: String,
         value: Float,
         onValueChange: (Float) -> Unit,
+        onValueChangeFinished: (() -> Unit)?,
         valueRange: ClosedFloatingPointRange<Float>,
         steps: Int,
         showValue: Boolean,
@@ -1115,6 +1118,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                     Slider(
                         value = value,
                         onValueChange = onValueChange,
+                        onValueChangeFinished = onValueChangeFinished,
                         valueRange = valueRange,
                         steps = steps,
                         modifier = Modifier
