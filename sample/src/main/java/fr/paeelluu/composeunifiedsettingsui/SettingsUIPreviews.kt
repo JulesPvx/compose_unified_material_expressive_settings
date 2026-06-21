@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -75,6 +77,33 @@ private fun SelectorItemPreview() {
                     selectedOption = "System Default",
                     onOptionSelected = {},
                     icon = { Icon(Icons.Default.ColorLens, contentDescription = null) }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "3. Slider Item")
+@Composable
+private fun SliderItemPreview() {
+    MaterialTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            SettingsSection(
+                title = "Volume",
+                modifier = Modifier.padding(16.dp)
+            ) {
+                slider(
+                    title = "Media Volume",
+                    subtitle = "Adjust the media playback volume",
+                    icon = {
+                        Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null)
+                    },
+                    value = 0.5f,
+                    valueLabel = { value -> "${(value * 100).toInt()}%" },
+                    showMinMax = true,
+                    onValueChange = {},
+                    valueRange = 0f..1f,
+                    steps = 10
                 )
             }
         }
