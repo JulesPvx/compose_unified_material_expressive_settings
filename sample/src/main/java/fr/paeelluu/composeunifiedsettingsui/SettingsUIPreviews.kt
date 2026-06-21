@@ -4,19 +4,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -24,140 +26,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.paeelluu.compose_settings_ui.SettingsSection
+import fr.paeelluu.compose_settings_ui.SettingsSectionScope
 
-@Preview(showBackground = true, name = "1. Action Item")
-@Composable
-private fun ActionItemPreview() {
-    MaterialTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            SettingsSection(
-                title = "Account",
-                modifier = Modifier.padding(16.dp)
-            ) {
-                action(
-                    title = "Profile Settings",
-                    subtitle = "Update your email and password",
-                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = null) },
-                    onClick = {}
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "2. Switch Item")
-@Composable
-private fun SwitchItemPreview() {
-    MaterialTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            SettingsSection(
-                title = "Notifications",
-                modifier = Modifier.padding(16.dp)
-            ) {
-                switch(
-                    title = "Push Notifications",
-                    subtitle = "Receive alerts on your device",
-                    checked = true,
-                    onCheckedChange = {},
-                    icon = { Icon(Icons.Default.Notifications, contentDescription = null) }
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "3. Selector Item")
-@Composable
-private fun SelectorItemPreview() {
-    MaterialTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            SettingsSection(
-                title = "Appearance",
-                modifier = Modifier.padding(16.dp)
-            ) {
-                selector(
-                    title = "App Theme",
-                    subtitle = "Current: System Default",
-                    options = listOf("Light", "Dark", "System Default"),
-                    selectedOption = "System Default",
-                    onOptionSelected = {},
-                    icon = { Icon(Icons.Default.ColorLens, contentDescription = null) }
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "3. Slider Item")
-@Composable
-private fun SliderItemPreview() {
-    MaterialTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            SettingsSection(
-                title = "Volume",
-                modifier = Modifier.padding(16.dp)
-            ) {
-                slider(
-                    title = "Media Volume",
-                    subtitle = "Adjust the media playback volume",
-                    icon = {
-                        Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null)
-                    },
-                    value = 0.5f,
-                    valueLabel = { value -> "${(value * 100).toInt()}%" },
-                    showMinMax = true,
-                    onValueChange = {},
-                    valueRange = 0f..1f,
-                    steps = 10
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "4. Keyword Editor")
-@Composable
-private fun KeywordEditorPreview() {
-    MaterialTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            SettingsSection(
-                title = "Keyword Editor",
-                modifier = Modifier.padding(16.dp)
-            ) {
-                keywordEditor(
-                    title = "Add Keywords",
-                    keywords = listOf("Compose", "Kotlin", "UI"),
-                    placeholder = "Enter a keyword",
-                    onAdd = {},
-                    onRemove = {}
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "4. Full Section (Grouped Shapes)", heightDp = 3000)
+@Preview(showBackground = true, heightDp = 800)
 @Composable
 fun FullSettingsScreenPreview() {
-    var bluetoothEnabled by remember { mutableStateOf(true) }
-    var selectedPowerMode by remember { mutableIntStateOf(1) }
-    var volume by remember { mutableFloatStateOf(0.5f) }
-    var displayName by remember { mutableStateOf("Jules") }
-    var keepScreenOn by remember { mutableStateOf(false) }
-    var selectedTheme by remember { mutableStateOf("System Default") }
-    var maxConnections by remember { mutableIntStateOf(3) }
-    var selectedLanguage by remember { mutableStateOf("English") }
-    var notificationsEnabled by remember { mutableStateOf(setOf("Email", "Push")) }
-    var searchPath by remember { mutableStateOf("") }
-    var selectedDate by remember { mutableStateOf<Long?>(null) }
-    var selectedColor by remember { mutableStateOf(Color(0xFF6E7FDC)) }
-    var connectionRange by remember { mutableStateOf(0.2f..0.8f) }
-
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -167,150 +45,323 @@ fun FullSettingsScreenPreview() {
                 modifier = Modifier
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(32.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                SettingsSection(title = "Search") {
-                    searchBar(
-                        query = searchPath,
-                        onQueryChange = { searchPath = it },
-                        placeholder = "Search for a setting..."
-                    )
-                }
-
                 SettingsSection(title = "Account") {
-                    userProfile(
-                        name = "Jules Pouvreaux",
-                        email = "jules@example.com",
-                        onClick = {}
-                    )
-                    
-                    textField(
-                        title = "Display Name",
-                        value = displayName,
-                        onValueChange = { displayName = it },
-                        placeholder = "Enter your name",
-                        isError = displayName.isEmpty(),
-                        supportingText = if (displayName.isEmpty()) "Name cannot be empty" else null
-                    )
+                    UserProfileSample()
+                    ActionSample()
                 }
 
-                SettingsSection(title = "Connectivity") {
-                    switch(
-                        title = "Bluetooth Beacon",
-                        subtitle = "Allow PC to discover this device",
-                        checked = bluetoothEnabled,
-                        onCheckedChange = { bluetoothEnabled = it },
-                        icon = { Icon(Icons.Default.Bluetooth, contentDescription = null) }
-                    )
-
-                    dialogSelector(
-                        title = "Language",
-                        options = listOf("English", "French", "Spanish", "German", "Japanese", "Chinese"),
-                        selectedOption = selectedLanguage,
-                        onOptionSelected = { selectedLanguage = it }
-                    )
-
-                    subHeader(text = "Advanced Connectivity")
-                    
-                    rangeSlider(
-                        title = "Signal Strength Range",
-                        value = connectionRange,
-                        onValueChange = { connectionRange = it },
-                        valueLabel = { "${(it * 100).toInt()}%" }
-                    )
+                SettingsSection(title = "System") {
+                    SwitchSample()
+                    SegmentedButtonSample()
+                    SliderSample()
                 }
 
-                SettingsSection(title = "Appearance") {
-                    segmentedButton(
-                        options = listOf("Light", "Dark", "System Default"),
-                        selectedOption = selectedTheme,
-                        onOptionSelected = { selectedTheme = it }
-                    )
-                    
-                    colorPicker(
-                        title = "Accent Color",
-                        subtitle = "Choose your favorite color",
-                        selectedColor = selectedColor,
-                        onColorSelected = { selectedColor = it }
-                    )
-
-                    slider(
-                        title = "Volume",
-                        value = volume,
-                        onValueChange = { volume = it },
-                        icon = { Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null) }
-                    )
+                SettingsSection(title = "Customization") {
+                    ColorPickerSample()
+                    ExpandableGroupSample()
                 }
 
-                SettingsSection(title = "Preferences") {
-                    subHeader(text = "Notifications")
-                    multiSelectList(
-                        options = listOf("Email", "Push", "SMS", "Desktop"),
-                        selectedOptions = notificationsEnabled,
-                        onSelectionChange = { notificationsEnabled = it }
-                    )
-
-                    subHeader(text = "Schedule")
-                    datePicker(
-                        title = "Sync Date",
-                        selectedDateMillis = selectedDate,
-                        onDateSelected = { selectedDate = it }
-                    )
-                    
-                    stepper(
-                        title = "Max Connections",
-                        value = maxConnections,
-                        onValueChange = { maxConnections = it },
-                        valueRange = 1..10
-                    )
-                }
-
-                SettingsSection(title = "General") {
-                    checkbox(
-                        title = "Keep screen on",
-                        subtitle = "Prevent device sleep",
-                        checked = keepScreenOn,
-                        onCheckedChange = { keepScreenOn = it }
-                    )
-
-                    expandableGroup(
-                        title = "Help & Support",
-                        icon = { Icon(Icons.Default.Notifications, contentDescription = null) }
-                    ) {
-                        link(
-                            title = "Documentation",
-                            onClick = {}
-                        )
-                        link(
-                            title = "Community Forum",
-                            onClick = {}
-                        )
-                    }
-
-                    loading(title = "System Update", subtitle = "Checking for updates...")
-
-                    info(
-                        text = "Your device is secured by biometric authentication."
-                    )
-
-                    link(
-                        title = "Legal Information",
-                        onClick = {},
-                        icon = { Icon(Icons.AutoMirrored.Filled.Help, contentDescription = null) }
-                    )
-
-                    action(
-                        title = "Factory Reset",
-                        subtitle = "This will erase all data",
-                        icon = { Icon(Icons.Default.Storage, contentDescription = null) },
-                        onClick = {}
-                    )
-                }
-                
                 SettingsSection(title = "About") {
-                    footer(text = "Version 1.0.8 (Alpha)\n© 2026 Jules Pouvreaux Labs")
+                    FooterSample()
                 }
             }
+        }
+    }
+}
+
+// --- Individual Component Samples (Private Extension Functions) ---
+
+@Composable
+private fun SettingsSectionScope.UserProfileSample() {
+    userProfile(
+        name = "Jules Pouvreaux",
+        email = "jules@example.com",
+        onClick = {}
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.ActionSample() {
+    action(
+        title = "Security Settings",
+        subtitle = "Manage your password and 2FA",
+        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+        onClick = {}
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.SwitchSample() {
+    var checked by remember { mutableStateOf(true) }
+    switch(
+        title = "Bluetooth Beacon",
+        subtitle = "Allow PC to discover this device",
+        checked = checked,
+        onCheckedChange = { checked = it },
+        icon = { Icon(Icons.Default.Bluetooth, contentDescription = null) }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.CheckboxSample() {
+    var checked by remember { mutableStateOf(false) }
+    checkbox(
+        title = "Keep screen on",
+        subtitle = "Prevent device sleep during sync",
+        checked = checked,
+        onCheckedChange = { checked = it }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.TextFieldSample() {
+    var text by remember { mutableStateOf("Jules") }
+    textField(
+        title = "Display Name",
+        value = text,
+        onValueChange = { text = it },
+        placeholder = "Enter your name",
+        isError = text.isEmpty(),
+        supportingText = if (text.isEmpty()) "Name cannot be empty" else null
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.LinkSample() {
+    link(
+        title = "Help & Support",
+        subtitle = "Documentation and FAQ",
+        icon = { Icon(Icons.AutoMirrored.Filled.Help, contentDescription = null) },
+        onClick = {}
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.SegmentedButtonSample() {
+    var selected by remember { mutableStateOf("Balanced") }
+    segmentedButton(
+        options = listOf("Battery", "Balanced", "Performance"),
+        selectedOption = selected,
+        onOptionSelected = { selected = it }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.StepperSample() {
+    var count by remember { mutableIntStateOf(3) }
+    stepper(
+        title = "Max Connections",
+        value = count,
+        onValueChange = { count = it },
+        valueRange = 1..10
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.SliderSample() {
+    var value by remember { mutableFloatStateOf(0.5f) }
+    slider(
+        title = "Volume",
+        value = value,
+        onValueChange = { value = it },
+        icon = { Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null) }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.RangeSliderSample() {
+    var range by remember { mutableStateOf(0.2f..0.8f) }
+    rangeSlider(
+        title = "Active Range",
+        value = range,
+        onValueChange = { range = it },
+        valueLabel = { "${(it * 100).toInt()}%" }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.ColorPickerSample() {
+    var color by remember { mutableStateOf(Color(0xFF6E7FDC)) }
+    colorPicker(
+        title = "Accent Color",
+        subtitle = "Choose your favorite flavor",
+        selectedColor = color,
+        onColorSelected = { color = it },
+        colors = listOf(
+            Color(0xFF6E7FDC), Color(0xFFE57373), Color(0xFF81C784),
+            Color(0xFFFFB74D), Color(0xFFBA68C8), Color(0xFF4DB6AC),
+            Color(0xFF90A4AE), Color(0xFFFFF176)
+        )
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.ExpandableGroupSample() {
+    expandableGroup(
+        title = "Advanced Preferences",
+        icon = { Icon(Icons.Default.Notifications, contentDescription = null) }
+    ) {
+        SwitchSample()
+        CheckboxSample()
+    }
+}
+
+@Composable
+private fun SettingsSectionScope.SelectorSample() {
+    var selected by remember { mutableStateOf("System") }
+    selector(
+        title = "Theme",
+        options = listOf("Light", "Dark", "System"),
+        selectedOption = selected,
+        onOptionSelected = { selected = it }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.DialogSelectorSample() {
+    var selected by remember { mutableStateOf("English") }
+    dialogSelector(
+        title = "Language",
+        options = listOf("English", "French", "Spanish", "German", "Japanese"),
+        selectedOption = selected,
+        onOptionSelected = { selected = it }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.RadioGroupSample() {
+    var selected by remember { mutableStateOf("Option 1") }
+    radioButtonGroup(
+        options = listOf("Option 1", "Option 2", "Option 3"),
+        selectedOption = selected,
+        onOptionSelected = { selected = it }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.MultiSelectListSample() {
+    var selected by remember { mutableStateOf(setOf("Email")) }
+    multiSelectList(
+        options = listOf("Email", "SMS", "Push", "Post"),
+        selectedOptions = selected,
+        onSelectionChange = { selected = it }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.KeywordEditorSample() {
+    var keywords by remember { mutableStateOf(listOf("Compose", "Material")) }
+    keywordEditor(
+        title = "Tags",
+        placeholder = "Add a tag...",
+        keywords = keywords,
+        onAdd = { keywords = keywords + it },
+        onRemove = { keywords = keywords - it }
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.InfoSample() {
+    info(text = "All data is encrypted locally on this device.")
+}
+
+@Composable
+private fun SettingsSectionScope.LoadingSample() {
+    loading(title = "Fetching updates...", subtitle = "This may take a moment")
+}
+
+@Composable
+private fun SettingsSectionScope.SearchBarSample() {
+    var query by remember { mutableStateOf("") }
+    searchBar(
+        query = query,
+        onQueryChange = { query = it },
+        placeholder = "Filter settings..."
+    )
+}
+
+@Composable
+private fun SettingsSectionScope.FooterSample() {
+    footer(text = "Version 1.0.8 (Alpha)\n© 2026 Jules Pouvreaux")
+}
+
+@Composable
+private fun SettingsSectionScope.ItemSample() {
+    item { shape ->
+        Surface(
+            modifier = Modifier.size(100.dp, 40.dp),
+            shape = shape,
+            color = MaterialTheme.colorScheme.tertiaryContainer
+        ) {
+            Text("Custom Raw Item", modifier = Modifier.padding(8.dp))
+        }
+    }
+}
+
+// --- Individual Component Previews ---
+
+@Preview(showBackground = true, name = "Components - Basic")
+@Composable
+private fun BasicComponentsPreview() {
+    MaterialTheme {
+        SettingsSection(title = "Basic Controls", modifier = Modifier.padding(16.dp)) {
+            ActionSample()
+            SwitchSample()
+            CheckboxSample()
+            LinkSample()
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Components - Input")
+@Composable
+private fun InputComponentsPreview() {
+    MaterialTheme {
+        SettingsSection(title = "Inputs", modifier = Modifier.padding(16.dp)) {
+            TextFieldSample()
+            StepperSample()
+            KeywordEditorSample()
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Components - Selection")
+@Composable
+private fun SelectionComponentsPreview() {
+    MaterialTheme {
+        SettingsSection(title = "Selection", modifier = Modifier.padding(16.dp)) {
+            SegmentedButtonSample()
+            SelectorSample()
+            DialogSelectorSample()
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Components - Specialized")
+@Composable
+private fun SpecializedComponentsPreview() {
+    MaterialTheme {
+        SettingsSection(title = "Specialized", modifier = Modifier.padding(16.dp)) {
+            ColorPickerSample()
+            SliderSample()
+            RangeSliderSample()
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Components - Advanced & Feedback")
+@Composable
+private fun AdvancedComponentsPreview() {
+    MaterialTheme {
+        SettingsSection(title = "Advanced & Feedback", modifier = Modifier.padding(16.dp)) {
+            SearchBarSample()
+            RadioGroupSample()
+            MultiSelectListSample()
+            InfoSample()
+            LoadingSample()
+            ItemSample()
         }
     }
 }

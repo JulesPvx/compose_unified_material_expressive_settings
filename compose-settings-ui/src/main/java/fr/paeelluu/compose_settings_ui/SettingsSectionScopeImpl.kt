@@ -404,7 +404,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
     override fun expandableGroup(
         title: String,
         icon: (@Composable () -> Unit)?,
-        content: SettingsSectionScope.() -> Unit
+        content: @Composable SettingsSectionScope.() -> Unit
     ) {
         items.add { shape ->
             var expanded by remember { mutableStateOf(false) }
@@ -442,7 +442,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                     enter = expandVertically(),
                     exit = shrinkVertically()
                 ) {
-                    val innerScope = SettingsSectionScopeImpl().apply(content)
+                    val innerScope = remember { SettingsSectionScopeImpl() }
+                    innerScope.items.clear()
+                    innerScope.content()
+
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(2.dp)

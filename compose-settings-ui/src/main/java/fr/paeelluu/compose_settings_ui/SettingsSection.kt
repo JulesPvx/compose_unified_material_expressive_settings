@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -29,9 +30,11 @@ import androidx.compose.ui.unit.dp
 public fun SettingsSection(
     title: String,
     modifier: Modifier = Modifier,
-    content: SettingsSectionScope.() -> Unit
+    content: @Composable SettingsSectionScope.() -> Unit
 ) {
-    val scope = SettingsSectionScopeImpl().apply(content)
+    val scope = remember { SettingsSectionScopeImpl() }
+    scope.items.clear()
+    scope.content()
 
     Column(
         modifier = modifier.fillMaxWidth(),

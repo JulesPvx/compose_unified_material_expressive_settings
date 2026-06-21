@@ -94,7 +94,7 @@ public interface SettingsSectionScope {
     public fun expandableGroup(
         title: String,
         icon: (@Composable () -> Unit)? = null,
-        content: SettingsSectionScope.() -> Unit
+        content: @Composable SettingsSectionScope.() -> Unit
     )
 
     public fun <T> selector(
