@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +54,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
@@ -68,8 +70,10 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonColors
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,12 +84,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.skydoves.colorpicker.compose.BrightnessSlider
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import fr.paeelluu.compose_settings_ui.components.KeywordEditor
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -900,6 +908,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun colorPicker(
         title: String,
         selectedColor: Color,
@@ -909,12 +918,15 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         icon: (@Composable () -> Unit)?
     ) {
         items.add { shape ->
-            var showDialog by remember { mutableStateOf(false) }
+            var showSheet by remember { mutableStateOf(false) }
+            val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
             val defaultColors = remember {
                 listOf(
-                    Color.Red, Color.Blue, Color.Green, Color.Yellow,
-                    Color.Cyan, Color.Magenta, Color.Black, Color.Gray,
-                    Color(0xFF6200EE), Color(0xFF03DAC5), Color(0xFFFF5722), Color(0xFFE91E63)
+                    Color(0xFFF44336), Color(0xFFE91E63), Color(0xFF9C27B0), Color(0xFF673AB7),
+                    Color(0xFF3F51B5), Color(0xFF2196F3), Color(0xFF03A9F4), Color(0xFF00BCD4),
+                    Color(0xFF009688), Color(0xFF4CAF50), Color(0xFF8BC34A), Color(0xFFCDDC39),
+                    Color(0xFF6E7FDC), Color(0xFFFFC107), Color(0xFFFF9800), Color(0xFFFF5722)
                 )
             }
             val displayColors = colors.ifEmpty { defaultColors }
@@ -924,63 +936,188 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                 subtitle = subtitle,
                 shape = shape,
                 leadingContent = icon,
-                onClick = { showDialog = true },
+                onClick = { showSheet = true },
                 trailingContent = {
                     Surface(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(28.dp),
                         shape = CircleShape,
                         color = selectedColor,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                        border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
                     ) {}
                 }
             )
 
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Select Color") },
-                    text = {
-                        LazyVerticalGrid(
-                            columns = GridCells.Adaptive(48.dp),
-                            contentPadding = PaddingValues(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+            if (showSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showSheet = false },
+                    sheetState = sheetState,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                ) {
+                    val colorController = rememberColorPickerController()
+                    var hexText by remember { mutableStateOf(longToHex(selectedColor.toArgb().toLong() and 0xFFFFFFFFL)) }
+                    var isHexError by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(selectedColor) {
+                        val newHex = longToHex(selectedColor.toArgb().toLong() and 0xFFFFFFFFL)
+                        if (hexText != newHex) {
+                            hexText = newHex
+                            isHexError = false
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp)
                         ) {
-                            items(displayColors) { color ->
+                            Box(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(selectedColor)
+                                    .border(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.outlineVariant,
+                                        RoundedCornerShape(12.dp)
+                                    )
+                            )
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            OutlinedTextField(
+                                value = hexText,
+                                onValueChange = { input: String ->
+                                    val cleanInput = if (input.startsWith("#")) input else "#$input"
+                                    if (cleanInput.length <= 9) {
+                                        hexText = cleanInput.uppercase()
+                                        val parsedColor = hexToLong(hexText)
+                                        if (parsedColor != null) {
+                                            isHexError = false
+                                            onColorSelected(Color(parsedColor))
+                                        } else {
+                                            isHexError = hexText.length >= 7
+                                        }
+                                    }
+                                },
+                                label = { Text("Hex Color") },
+                                isError = isHexError,
+                                singleLine = true,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        }
+
+                        HsvColorPicker(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(250.dp)
+                                .padding(vertical = 8.dp),
+                            controller = colorController,
+                            initialColor = selectedColor,
+                            onColorChanged = { colorEnvelope ->
+                                if (colorEnvelope.fromUser) {
+                                    onColorSelected(colorEnvelope.color)
+                                }
+                            }
+                        )
+
+                        BrightnessSlider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .padding(vertical = 8.dp),
+                            controller = colorController,
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "Presets",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .align(Alignment.Start)
+                                .padding(bottom = 12.dp)
+                        )
+
+                        @OptIn(ExperimentalLayoutApi::class)
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            displayColors.forEach { color ->
+                                val isSelected = color == selectedColor
                                 Box(
                                     modifier = Modifier
-                                        .size(48.dp)
-                                        .aspectRatio(1f)
+                                        .size(44.dp)
                                         .clip(CircleShape)
                                         .background(color)
-                                        .clickable {
-                                            onColorSelected(color)
-                                            showDialog = false
-                                        }
-                                        .then(
-                                            if (color == selectedColor) Modifier.background(
-                                                color.copy(alpha = 0.5f),
-                                                CircleShape
-                                            ) else Modifier
+                                        .clickable { onColorSelected(color) }
+                                        .border(
+                                            width = if (isSelected) 3.dp else 1.dp,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                                            shape = CircleShape
                                         ),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    if (color == selectedColor) {
+                                    if (isSelected) {
                                         Icon(
                                             Icons.Default.Check,
                                             contentDescription = null,
-                                            tint = if (color == Color.White) Color.Black else Color.White
+                                            tint = if (isLightColor(color)) Color.Black else Color.White,
+                                            modifier = Modifier.size(24.dp)
                                         )
                                     }
                                 }
                             }
                         }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showDialog = false }) { Text("Close") }
                     }
-                )
+                }
             }
+        }
+    }
+
+    private fun isLightColor(color: Color): Boolean {
+        val luminance = 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue
+        return luminance > 0.5
+    }
+
+    // Helper functions for safe Hex <-> Long conversion
+    private fun hexToLong(hex: String): Long? {
+        val cleanHex = hex.removePrefix("#").uppercase()
+        return try {
+            when (cleanHex.length) {
+                6 -> "FF$cleanHex".toLong(16)
+                8 -> cleanHex.toLong(16)
+                else -> null
+            }
+        } catch (e: NumberFormatException) {
+            null
+        }
+    }
+
+    private fun longToHex(value: Long): String {
+        val alpha = (value shr 24) and 0xFF
+        return if (alpha == 0xFFL) {
+            String.format("#%06X", value and 0xFFFFFF).uppercase()
+        } else {
+            String.format("#%08X", value).uppercase()
         }
     }
 
