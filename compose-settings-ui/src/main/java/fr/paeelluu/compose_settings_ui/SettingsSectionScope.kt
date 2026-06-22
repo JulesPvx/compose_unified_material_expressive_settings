@@ -25,6 +25,7 @@ public interface SettingsSectionScope {
         title: String,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null,
         onClick: () -> Unit
     )
 
@@ -33,7 +34,8 @@ public interface SettingsSectionScope {
         checked: Boolean,
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun checkbox(
@@ -41,7 +43,8 @@ public interface SettingsSectionScope {
         checked: Boolean,
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun textField(
@@ -53,13 +56,15 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         isError: Boolean = false,
-        supportingText: String? = null
+        supportingText: String? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun link(
         title: String,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null,
         onClick: () -> Unit
     )
 
@@ -67,7 +72,8 @@ public interface SettingsSectionScope {
         options: List<T>,
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
-        displayText: (T) -> String = { it.toString() }
+        displayText: (T) -> String = { it.toString() },
+        sharedTransitionKey: Any? = null
     )
 
     public fun stepper(
@@ -76,25 +82,29 @@ public interface SettingsSectionScope {
         onValueChange: (Int) -> Unit,
         valueRange: IntRange = 0..10,
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun info(
         text: String,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun userProfile(
         name: String,
         email: String,
         avatar: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null,
         onClick: (() -> Unit)? = null
     )
 
     public fun expandableGroup(
         title: String,
         icon: (@Composable () -> Unit)? = null,
-        content: SettingsSectionScope.() -> Unit
+        sharedTransitionKey: Any? = null,
+        content: @Composable SettingsSectionScope.() -> Unit
     )
 
     public fun <T> selector(
@@ -104,7 +114,8 @@ public interface SettingsSectionScope {
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String = { it.toString() },
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun <T> dialogSelector(
@@ -114,21 +125,24 @@ public interface SettingsSectionScope {
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String = { it.toString() },
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun <T> radioButtonGroup(
         options: List<T>,
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
-        displayText: (T) -> String = { it.toString() }
+        displayText: (T) -> String = { it.toString() },
+        sharedTransitionKey: Any? = null
     )
 
     public fun <T> multiSelectList(
         options: List<T>,
         selectedOptions: Set<T>,
         onSelectionChange: (Set<T>) -> Unit,
-        displayText: (T) -> String = { it.toString() }
+        displayText: (T) -> String = { it.toString() },
+        sharedTransitionKey: Any? = null
     )
 
     public fun rangeSlider(
@@ -140,7 +154,8 @@ public interface SettingsSectionScope {
         steps: Int = 0,
         valueLabel: (Float) -> String = { it.toString() },
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun timePicker(
@@ -150,7 +165,8 @@ public interface SettingsSectionScope {
         onTimeSelected: (hour: Int, minute: Int) -> Unit,
         is24Hour: Boolean = true,
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun datePicker(
@@ -158,7 +174,8 @@ public interface SettingsSectionScope {
         selectedDateMillis: Long?,
         onDateSelected: (Long?) -> Unit,
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun colorPicker(
@@ -167,19 +184,31 @@ public interface SettingsSectionScope {
         onColorSelected: (androidx.compose.ui.graphics.Color) -> Unit,
         colors: List<androidx.compose.ui.graphics.Color> = emptyList(),
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
-    public fun footer(text: String)
+    public fun footer(
+        text: String,
+        sharedTransitionKey: Any? = null
+    )
 
-    public fun loading(title: String, subtitle: String? = null)
+    public fun loading(
+        title: String,
+        subtitle: String? = null,
+        sharedTransitionKey: Any? = null
+    )
 
-    public fun subHeader(text: String)
+    public fun subHeader(
+        text: String,
+        sharedTransitionKey: Any? = null
+    )
 
     public fun searchBar(
         query: String,
         onQueryChange: (String) -> Unit,
-        placeholder: String = "Search settings..."
+        placeholder: String = "Search settings...",
+        sharedTransitionKey: Any? = null
     )
 
     public fun slider(
@@ -193,7 +222,8 @@ public interface SettingsSectionScope {
         valueLabel: (Float) -> String = { it.toString() },
         showMinMax: Boolean = false,
         subtitle: String? = null,
-        icon: (@Composable () -> Unit)? = null
+        icon: (@Composable () -> Unit)? = null,
+        sharedTransitionKey: Any? = null
     )
 
     public fun keywordEditor(
@@ -201,6 +231,7 @@ public interface SettingsSectionScope {
         placeholder: String,
         keywords: List<String>,
         onAdd: (String) -> Unit,
-        onRemove: (String) -> Unit
+        onRemove: (String) -> Unit,
+        sharedTransitionKey: Any? = null
     )
 }

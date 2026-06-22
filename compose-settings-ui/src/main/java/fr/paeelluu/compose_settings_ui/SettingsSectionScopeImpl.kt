@@ -1,6 +1,9 @@
 package fr.paeelluu.compose_settings_ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -99,7 +102,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-internal class SettingsSectionScopeImpl : SettingsSectionScope {
+@OptIn(ExperimentalSharedTransitionApi::class)
+internal class SettingsSectionScopeImpl(
+    private val sharedTransitionScope: SharedTransitionScope? = null,
+    private val animatedVisibilityScope: AnimatedVisibilityScope? = null
+) : SettingsSectionScope {
     internal val items = mutableListOf<@Composable (Shape) -> Unit>()
 
     override fun item(content: @Composable (Shape) -> Unit) {
@@ -110,6 +117,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         title: String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?,
         onClick: () -> Unit
     ) {
         items.add { shape ->
@@ -118,7 +126,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                 subtitle = subtitle,
                 shape = shape,
                 leadingContent = icon,
-                onClick = onClick
+                onClick = onClick,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
         }
     }
@@ -128,7 +139,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         checked: Boolean,
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             SettingsItemBase(
@@ -137,7 +149,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                 shape = shape,
                 leadingContent = icon,
                 onClick = { onCheckedChange(!checked) },
-                trailingContent = { Switch(checked = checked, onCheckedChange = onCheckedChange) }
+                trailingContent = { Switch(checked = checked, onCheckedChange = onCheckedChange) },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
         }
     }
@@ -147,7 +162,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         checked: Boolean,
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             SettingsItemBase(
@@ -156,7 +172,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                 shape = shape,
                 leadingContent = icon,
                 onClick = { onCheckedChange(!checked) },
-                trailingContent = { Checkbox(checked = checked, onCheckedChange = onCheckedChange) }
+                trailingContent = { Checkbox(checked = checked, onCheckedChange = onCheckedChange) },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
         }
     }
@@ -170,12 +189,25 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         isError: Boolean,
-        supportingText: String?
+        supportingText: String?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
@@ -228,6 +260,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         title: String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?,
         onClick: () -> Unit
     ) {
         items.add { shape ->
@@ -243,7 +276,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
+                },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
         }
     }
@@ -253,12 +289,25 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         options: List<T>,
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
-        displayText: (T) -> String
+        displayText: (T) -> String,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
@@ -309,7 +358,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         onValueChange: (Int) -> Unit,
         valueRange: IntRange,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             SettingsItemBase(
@@ -341,16 +391,31 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                             Icon(Icons.Default.Add, contentDescription = "Increase")
                         }
                     }
-                }
+                },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
         }
     }
 
-    override fun info(text: String, icon: (@Composable () -> Unit)?) {
+    override fun info(text: String, icon: (@Composable () -> Unit)?, sharedTransitionKey: Any?) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.secondaryContainer
             ) {
@@ -382,6 +447,7 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         name: String,
         email: String,
         avatar: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?,
         onClick: (() -> Unit)?
     ) {
         items.add { shape ->
@@ -404,7 +470,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                             )
                         }
                     }
-                }
+                },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
         }
     }
@@ -412,7 +481,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
     override fun expandableGroup(
         title: String,
         icon: (@Composable () -> Unit)?,
-        content: SettingsSectionScope.() -> Unit
+        sharedTransitionKey: Any?,
+        content: @Composable SettingsSectionScope.() -> Unit
     ) {
         items.add { shape ->
             var expanded by remember { mutableStateOf(false) }
@@ -442,7 +512,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                             contentDescription = null,
                             modifier = Modifier.rotate(expandedFraction * 180f)
                         )
-                    }
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    sharedTransitionKey = sharedTransitionKey
                 )
 
                 AnimatedVisibility(
@@ -450,7 +523,14 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                     enter = expandVertically(),
                     exit = shrinkVertically()
                 ) {
-                    val innerScope = SettingsSectionScopeImpl().apply(content)
+                    val innerScope = remember {
+                        SettingsSectionScopeImpl(
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                    }
+                    innerScope.items.clear()
+                    innerScope.content()
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -486,7 +566,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             var expanded by remember { mutableStateOf(false) }
@@ -537,7 +618,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                                 modifier = Modifier.rotate(arrowRotation)
                             )
                         }
-                    }
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    sharedTransitionKey = sharedTransitionKey
                 )
 
                 AnimatedVisibility(
@@ -600,7 +684,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             var showDialog by remember { mutableStateOf(false) }
@@ -617,7 +702,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
+                },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
 
             if (showDialog) {
@@ -664,12 +752,25 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         options: List<T>,
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
-        displayText: (T) -> String
+        displayText: (T) -> String,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
@@ -703,12 +804,25 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         options: List<T>,
         selectedOptions: Set<T>,
         onSelectionChange: (Set<T>) -> Unit,
-        displayText: (T) -> String
+        displayText: (T) -> String,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
@@ -755,12 +869,25 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         steps: Int,
         valueLabel: (Float) -> String,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
@@ -823,7 +950,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         onTimeSelected: (hour: Int, minute: Int) -> Unit,
         is24Hour: Boolean,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             var showDialog by remember { mutableStateOf(false) }
@@ -835,13 +963,16 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
 
             SettingsItemBase(
                 title = title,
-                subtitle = subtitle ?: String.format("%02d:%02d", hour, minute),
+                subtitle = subtitle ?: String.format(Locale.getDefault(), "%02d:%02d", hour, minute),
                 shape = shape,
                 leadingContent = icon,
                 onClick = { showDialog = true },
                 trailingContent = {
                     Icon(Icons.Default.TimeToLeave, contentDescription = null)
-                }
+                },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
 
             if (showDialog) {
@@ -869,7 +1000,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         selectedDateMillis: Long?,
         onDateSelected: (Long?) -> Unit,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             var showDialog by remember { mutableStateOf(false) }
@@ -884,7 +1016,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                 onClick = { showDialog = true },
                 trailingContent = {
                     Icon(Icons.Default.DateRange, contentDescription = null)
-                }
+                },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
 
             if (showDialog) {
@@ -913,7 +1048,8 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         onColorSelected: (Color) -> Unit,
         colors: List<Color>,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
             var showSheet by remember { mutableStateOf(false) }
@@ -942,7 +1078,10 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
                         color = selectedColor,
                         border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
                     ) {}
-                }
+                },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                sharedTransitionKey = sharedTransitionKey
             )
 
             if (showSheet) {
@@ -1119,25 +1258,49 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         }
     }
 
-    override fun footer(text: String) {
+    override fun footer(text: String, sharedTransitionKey: Any?) {
         items.add { _ ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .padding(horizontal = 24.dp, vertical = 8.dp),
                 textAlign = TextAlign.Center
             )
         }
     }
 
-    override fun loading(title: String, subtitle: String?) {
+    override fun loading(title: String, subtitle: String?, sharedTransitionKey: Any?) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
@@ -1157,24 +1320,49 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         }
     }
 
-    override fun subHeader(text: String) {
+    override fun subHeader(text: String, sharedTransitionKey: Any?) {
         items.add { _ ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                modifier = Modifier
+                    .then(sharedModifier)
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
             )
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override fun searchBar(query: String, onQueryChange: (String) -> Unit, placeholder: String) {
+    override fun searchBar(query: String, onQueryChange: (String) -> Unit, placeholder: String, sharedTransitionKey: Any?) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .clip(shape)
             ) {
@@ -1206,12 +1394,25 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         valueLabel: (Float) -> String,
         showMinMax: Boolean,
         subtitle: String?,
-        icon: (@Composable () -> Unit)?
+        icon: (@Composable () -> Unit)?,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {
@@ -1293,12 +1494,25 @@ internal class SettingsSectionScopeImpl : SettingsSectionScope {
         placeholder: String,
         keywords: List<String>,
         onAdd: (String) -> Unit,
-        onRemove: (String) -> Unit
+        onRemove: (String) -> Unit,
+        sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(sharedModifier)
                     .clip(shape),
                 color = MaterialTheme.colorScheme.surfaceContainer
             ) {

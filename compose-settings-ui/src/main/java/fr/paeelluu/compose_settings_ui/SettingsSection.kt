@@ -15,6 +15,8 @@
 
 package fr.paeelluu.compose_settings_ui
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,9 +31,15 @@ import androidx.compose.ui.unit.dp
 public fun SettingsSection(
     title: String,
     modifier: Modifier = Modifier,
-    content: SettingsSectionScope.() -> Unit
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    content: @Composable SettingsSectionScope.() -> Unit
 ) {
-    val scope = SettingsSectionScopeImpl().apply(content)
+    val scope = SettingsSectionScopeImpl(
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
+    )
+    scope.content()
 
     Column(
         modifier = modifier.fillMaxWidth(),
