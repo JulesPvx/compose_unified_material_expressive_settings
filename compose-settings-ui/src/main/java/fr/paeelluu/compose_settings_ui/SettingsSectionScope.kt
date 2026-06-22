@@ -104,7 +104,7 @@ public interface SettingsSectionScope {
         title: String,
         icon: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null,
-        content: @Composable SettingsSectionScope.() -> Unit
+        content: SettingsSectionScope.() -> Unit
     )
 
     public fun <T> selector(

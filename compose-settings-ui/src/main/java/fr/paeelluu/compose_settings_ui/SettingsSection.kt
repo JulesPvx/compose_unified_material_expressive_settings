@@ -33,7 +33,7 @@ public fun SettingsSection(
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
-    content: @Composable SettingsSectionScope.() -> Unit
+    content: SettingsSectionScope.() -> Unit
 ) {
     val scope = SettingsSectionScopeImpl(
         sharedTransitionScope = sharedTransitionScope,

@@ -7,14 +7,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -23,10 +21,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -155,6 +151,11 @@ fun SharedTransitionSamplePreview() {
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 fun FullSettingsScreenPreview() {
+    var bluetoothEnabled by remember { mutableStateOf(true) }
+    var selectedPerformance by remember { mutableStateOf("Balanced") }
+    var volume by remember { mutableFloatStateOf(0.5f) }
+    var accentColor by remember { mutableStateOf(Color(0xFF6E7FDC)) }
+
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -172,13 +173,13 @@ fun FullSettingsScreenPreview() {
                 }
 
                 SettingsSection(title = "System") {
-                    SwitchSample()
-                    SegmentedButtonSample()
-                    SliderSample()
+                    SwitchSample(bluetoothEnabled) { bluetoothEnabled = it }
+                    SegmentedButtonSample(selectedPerformance) { selectedPerformance = it }
+                    SliderSample(volume) { volume = it }
                 }
 
                 SettingsSection(title = "Customization") {
-                    ColorPickerSample()
+                    ColorPickerSample(accentColor) { accentColor = it }
                     ExpandableGroupSample()
                 }
 
@@ -190,9 +191,8 @@ fun FullSettingsScreenPreview() {
     }
 }
 
-// --- Individual Component Samples (Private Extension Functions) ---
+// --- Individual Component Samples (Private Scoped Extensions) ---
 
-@Composable
 private fun SettingsSectionScope.UserProfileSample() {
     userProfile(
         name = "Jules Pouvreaux",
@@ -201,7 +201,6 @@ private fun SettingsSectionScope.UserProfileSample() {
     )
 }
 
-@Composable
 private fun SettingsSectionScope.ActionSample() {
     action(
         title = "Security Settings",
@@ -211,43 +210,36 @@ private fun SettingsSectionScope.ActionSample() {
     )
 }
 
-@Composable
-private fun SettingsSectionScope.SwitchSample() {
-    var checked by remember { mutableStateOf(true) }
+private fun SettingsSectionScope.SwitchSample(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     switch(
         title = "Bluetooth Beacon",
         subtitle = "Allow PC to discover this device",
         checked = checked,
-        onCheckedChange = { checked = it },
+        onCheckedChange = onCheckedChange,
         icon = { Icon(Icons.Default.Bluetooth, contentDescription = null) }
     )
 }
 
-@Composable
-private fun SettingsSectionScope.CheckboxSample() {
-    var checked by remember { mutableStateOf(false) }
+private fun SettingsSectionScope.CheckboxSample(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     checkbox(
         title = "Keep screen on",
         subtitle = "Prevent device sleep during sync",
         checked = checked,
-        onCheckedChange = { checked = it }
+        onCheckedChange = onCheckedChange
     )
 }
 
-@Composable
-private fun SettingsSectionScope.TextFieldSample() {
-    var text by remember { mutableStateOf("Jules") }
+private fun SettingsSectionScope.TextFieldSample(value: String, onValueChange: (String) -> Unit) {
     textField(
         title = "Display Name",
-        value = text,
-        onValueChange = { text = it },
+        value = value,
+        onValueChange = onValueChange,
         placeholder = "Enter your name",
-        isError = text.isEmpty(),
-        supportingText = if (text.isEmpty()) "Name cannot be empty" else null
+        isError = value.isEmpty(),
+        supportingText = if (value.isEmpty()) "Name cannot be empty" else null
     )
 }
 
-@Composable
 private fun SettingsSectionScope.LinkSample() {
     link(
         title = "Help & Support",
@@ -257,57 +249,47 @@ private fun SettingsSectionScope.LinkSample() {
     )
 }
 
-@Composable
-private fun SettingsSectionScope.SegmentedButtonSample() {
-    var selected by remember { mutableStateOf("Balanced") }
+private fun SettingsSectionScope.SegmentedButtonSample(selected: String, onSelected: (String) -> Unit) {
     segmentedButton(
         options = listOf("Battery", "Balanced", "Performance"),
         selectedOption = selected,
-        onOptionSelected = { selected = it }
+        onOptionSelected = onSelected
     )
 }
 
-@Composable
-private fun SettingsSectionScope.StepperSample() {
-    var count by remember { mutableIntStateOf(3) }
+private fun SettingsSectionScope.StepperSample(value: Int, onValueChange: (Int) -> Unit) {
     stepper(
         title = "Max Connections",
-        value = count,
-        onValueChange = { count = it },
+        value = value,
+        onValueChange = onValueChange,
         valueRange = 1..10
     )
 }
 
-@Composable
-private fun SettingsSectionScope.SliderSample() {
-    var value by remember { mutableFloatStateOf(0.5f) }
+private fun SettingsSectionScope.SliderSample(value: Float, onValueChange: (Float) -> Unit) {
     slider(
         title = "Volume",
         value = value,
-        onValueChange = { value = it },
+        onValueChange = onValueChange,
         icon = { Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null) }
     )
 }
 
-@Composable
-private fun SettingsSectionScope.RangeSliderSample() {
-    var range by remember { mutableStateOf(0.2f..0.8f) }
+private fun SettingsSectionScope.RangeSliderSample(value: ClosedFloatingPointRange<Float>, onValueChange: (ClosedFloatingPointRange<Float>) -> Unit) {
     rangeSlider(
         title = "Active Range",
-        value = range,
-        onValueChange = { range = it },
+        value = value,
+        onValueChange = onValueChange,
         valueLabel = { "${(it * 100).toInt()}%" }
     )
 }
 
-@Composable
-private fun SettingsSectionScope.ColorPickerSample() {
-    var color by remember { mutableStateOf(Color(0xFF6E7FDC)) }
+private fun SettingsSectionScope.ColorPickerSample(color: Color, onColorSelected: (Color) -> Unit) {
     colorPicker(
         title = "Accent Color",
         subtitle = "Choose your favorite flavor",
         selectedColor = color,
-        onColorSelected = { color = it },
+        onColorSelected = onColorSelected,
         colors = listOf(
             Color(0xFF6E7FDC), Color(0xFFE57373), Color(0xFF81C784),
             Color(0xFFFFB74D), Color(0xFFBA68C8), Color(0xFF4DB6AC),
@@ -316,97 +298,80 @@ private fun SettingsSectionScope.ColorPickerSample() {
     )
 }
 
-@Composable
 private fun SettingsSectionScope.ExpandableGroupSample() {
     expandableGroup(
         title = "Advanced Preferences",
         icon = { Icon(Icons.Default.Notifications, contentDescription = null) }
     ) {
-        SwitchSample()
-        CheckboxSample()
+        action(title = "Item 1", onClick = {})
+        action(title = "Item 2", onClick = {})
     }
 }
 
-@Composable
-private fun SettingsSectionScope.SelectorSample() {
-    var selected by remember { mutableStateOf("System") }
+private fun SettingsSectionScope.SelectorSample(selected: String, onSelected: (String) -> Unit) {
     selector(
         title = "Theme",
         options = listOf("Light", "Dark", "System"),
         selectedOption = selected,
-        onOptionSelected = { selected = it }
+        onOptionSelected = onSelected
     )
 }
 
-@Composable
-private fun SettingsSectionScope.DialogSelectorSample() {
-    var selected by remember { mutableStateOf("English") }
+private fun SettingsSectionScope.DialogSelectorSample(selected: String, onSelected: (String) -> Unit) {
     dialogSelector(
         title = "Language",
         options = listOf("English", "French", "Spanish", "German", "Japanese"),
         selectedOption = selected,
-        onOptionSelected = { selected = it }
+        onOptionSelected = onSelected
     )
 }
 
-@Composable
-private fun SettingsSectionScope.RadioGroupSample() {
-    var selected by remember { mutableStateOf("Option 1") }
+private fun SettingsSectionScope.RadioGroupSample(selected: String, onSelected: (String) -> Unit) {
     radioButtonGroup(
         options = listOf("Option 1", "Option 2", "Option 3"),
         selectedOption = selected,
-        onOptionSelected = { selected = it }
+        onOptionSelected = onSelected
     )
 }
 
-@Composable
-private fun SettingsSectionScope.MultiSelectListSample() {
-    var selected by remember { mutableStateOf(setOf("Email")) }
+private fun SettingsSectionScope.MultiSelectListSample(selected: Set<String>, onSelectionChange: (Set<String>) -> Unit) {
     multiSelectList(
         options = listOf("Email", "SMS", "Push", "Post"),
         selectedOptions = selected,
-        onSelectionChange = { selected = it }
+        onSelectionChange = onSelectionChange
     )
 }
 
-@Composable
-private fun SettingsSectionScope.KeywordEditorSample() {
-    var keywords by remember { mutableStateOf(listOf("Compose", "Material")) }
+private fun SettingsSectionScope.KeywordEditorSample(keywords: List<String>, onAdd: (String) -> Unit, onRemove: (String) -> Unit) {
     keywordEditor(
         title = "Tags",
         placeholder = "Add a tag...",
         keywords = keywords,
-        onAdd = { keywords = keywords + it },
-        onRemove = { keywords = keywords - it }
+        onAdd = onAdd,
+        onRemove = onRemove
     )
 }
 
-@Composable
 private fun SettingsSectionScope.InfoSample() {
     info(text = "All data is encrypted locally on this device.")
 }
 
-@Composable
 private fun SettingsSectionScope.LoadingSample() {
     loading(title = "Fetching updates...", subtitle = "This may take a moment")
 }
 
-@Composable
-private fun SettingsSectionScope.SearchBarSample() {
-    var query by remember { mutableStateOf("") }
+private fun SettingsSectionScope.SearchBarSample(query: String, onQueryChange: (String) -> Unit) {
     searchBar(
         query = query,
-        onQueryChange = { query = it },
+        onQueryChange = onQueryChange,
         placeholder = "Filter settings..."
     )
 }
 
-@Composable
 private fun SettingsSectionScope.FooterSample() {
     footer(text = "Version 1.0.8 (Alpha)\n© 2026 Jules Pouvreaux")
 }
 
-@Composable
 private fun SettingsSectionScope.ItemSample() {
     item { shape ->
         Surface(
@@ -424,11 +389,14 @@ private fun SettingsSectionScope.ItemSample() {
 @Preview(showBackground = true, name = "Components - Basic")
 @Composable
 private fun BasicComponentsPreview() {
+    var switchState by remember { mutableStateOf(true) }
+    var checkboxState by remember { mutableStateOf(false) }
+
     MaterialTheme {
         SettingsSection(title = "Basic Controls", modifier = Modifier.padding(16.dp)) {
             ActionSample()
-            SwitchSample()
-            CheckboxSample()
+            SwitchSample(switchState) { switchState = it }
+            CheckboxSample(checkboxState) { checkboxState = it }
             LinkSample()
         }
     }
@@ -437,11 +405,15 @@ private fun BasicComponentsPreview() {
 @Preview(showBackground = true, name = "Components - Input")
 @Composable
 private fun InputComponentsPreview() {
+    var text by remember { mutableStateOf("Jules") }
+    var count by remember { mutableIntStateOf(3) }
+    var keywords by remember { mutableStateOf(listOf("Compose")) }
+
     MaterialTheme {
         SettingsSection(title = "Inputs", modifier = Modifier.padding(16.dp)) {
-            TextFieldSample()
-            StepperSample()
-            KeywordEditorSample()
+            TextFieldSample(text) { text = it }
+            StepperSample(count) { count = it }
+            KeywordEditorSample(keywords, { keywords = keywords + it }, { keywords = keywords - it })
         }
     }
 }
@@ -449,11 +421,15 @@ private fun InputComponentsPreview() {
 @Preview(showBackground = true, name = "Components - Selection")
 @Composable
 private fun SelectionComponentsPreview() {
+    var segSelected by remember { mutableStateOf("Balanced") }
+    var selSelected by remember { mutableStateOf("System") }
+    var dialSelected by remember { mutableStateOf("English") }
+
     MaterialTheme {
         SettingsSection(title = "Selection", modifier = Modifier.padding(16.dp)) {
-            SegmentedButtonSample()
-            SelectorSample()
-            DialogSelectorSample()
+            SegmentedButtonSample(segSelected) { segSelected = it }
+            SelectorSample(selSelected) { selSelected = it }
+            DialogSelectorSample(dialSelected) { dialSelected = it }
         }
     }
 }
@@ -461,11 +437,15 @@ private fun SelectionComponentsPreview() {
 @Preview(showBackground = true, name = "Components - Specialized")
 @Composable
 private fun SpecializedComponentsPreview() {
+    var color by remember { mutableStateOf(Color(0xFF6E7FDC)) }
+    var vol by remember { mutableFloatStateOf(0.5f) }
+    var range by remember { mutableStateOf(0.2f..0.8f) }
+
     MaterialTheme {
         SettingsSection(title = "Specialized", modifier = Modifier.padding(16.dp)) {
-            ColorPickerSample()
-            SliderSample()
-            RangeSliderSample()
+            ColorPickerSample(color) { color = it }
+            SliderSample(vol) { vol = it }
+            RangeSliderSample(range) { range = it }
         }
     }
 }
@@ -473,11 +453,15 @@ private fun SpecializedComponentsPreview() {
 @Preview(showBackground = true, name = "Components - Advanced & Feedback")
 @Composable
 private fun AdvancedComponentsPreview() {
+    var query by remember { mutableStateOf("") }
+    var radioSelected by remember { mutableStateOf("Option 1") }
+    var multiSelected by remember { mutableStateOf(setOf("Email")) }
+
     MaterialTheme {
         SettingsSection(title = "Advanced & Feedback", modifier = Modifier.padding(16.dp)) {
-            SearchBarSample()
-            RadioGroupSample()
-            MultiSelectListSample()
+            SearchBarSample(query) { query = it }
+            RadioGroupSample(radioSelected) { radioSelected = it }
+            MultiSelectListSample(multiSelected) { multiSelected = it }
             InfoSample()
             LoadingSample()
             ItemSample()

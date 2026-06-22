@@ -482,7 +482,7 @@ internal class SettingsSectionScopeImpl(
         title: String,
         icon: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?,
-        content: @Composable SettingsSectionScope.() -> Unit
+        content: SettingsSectionScope.() -> Unit
     ) {
         items.add { shape ->
             var expanded by remember { mutableStateOf(false) }
@@ -523,13 +523,10 @@ internal class SettingsSectionScopeImpl(
                     enter = expandVertically(),
                     exit = shrinkVertically()
                 ) {
-                    val innerScope = remember {
-                        SettingsSectionScopeImpl(
-                            sharedTransitionScope = sharedTransitionScope,
-                            animatedVisibilityScope = animatedVisibilityScope
-                        )
-                    }
-                    innerScope.items.clear()
+                    val innerScope = SettingsSectionScopeImpl(
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
                     innerScope.content()
 
                     Column(
