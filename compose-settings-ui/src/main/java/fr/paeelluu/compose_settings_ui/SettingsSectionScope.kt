@@ -18,35 +18,61 @@ package fr.paeelluu.compose_settings_ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Shape
 
+/**
+ * Receiver scope for [SettingsSection] content DSL.
+ */
 public interface SettingsSectionScope {
+    /**
+     * Adds a generic custom item to the section.
+     * @category Structure & Layout
+     */
     public fun item(content: @Composable (Shape) -> Unit)
 
+    /**
+     * Adds a clickable action item.
+     * @category Basic Actions
+     */
     public fun action(
         title: String,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null,
         onClick: () -> Unit
     )
 
+    /**
+     * Adds a toggleable switch item.
+     * @category Toggles
+     */
     public fun switch(
         title: String,
         checked: Boolean,
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a toggleable checkbox item.
+     * @category Toggles
+     */
     public fun checkbox(
         title: String,
         checked: Boolean,
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a text input field item.
+     * @category Input
+     */
     public fun textField(
         title: String,
         value: String,
@@ -55,19 +81,29 @@ public interface SettingsSectionScope {
         placeholder: String? = null,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         isError: Boolean = false,
         supportingText: String? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a navigation link item with a trailing arrow.
+     * @category Basic Actions
+     */
     public fun link(
         title: String,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null,
         onClick: () -> Unit
     )
 
+    /**
+     * Adds a horizontal segmented button for mutual exclusion.
+     * @category Selection
+     */
     public fun <T> segmentedButton(
         options: List<T>,
         selectedOption: T,
@@ -76,6 +112,10 @@ public interface SettingsSectionScope {
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a numeric stepper with +/- buttons.
+     * @category Input
+     */
     public fun stepper(
         title: String,
         value: Int,
@@ -83,30 +123,49 @@ public interface SettingsSectionScope {
         valueRange: IntRange = 0..10,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds an informational block with a secondary background.
+     * @category Structure & Layout
+     */
     public fun info(
         text: String,
         icon: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a specialized user profile item.
+     * @category Basic Actions
+     */
     public fun userProfile(
         name: String,
         email: String,
         avatar: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null,
         onClick: (() -> Unit)? = null
     )
 
+    /**
+     * Adds a collapsible group of settings.
+     * @category Structure & Layout
+     */
     public fun expandableGroup(
         title: String,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null,
         content: SettingsSectionScope.() -> Unit
     )
 
+    /**
+     * Adds an inline expandable selector with radio options.
+     * @category Selection
+     */
     public fun <T> selector(
         title: String,
         options: List<T>,
@@ -115,9 +174,14 @@ public interface SettingsSectionScope {
         displayText: (T) -> String = { it.toString() },
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a dialog-based selector for long lists of options.
+     * @category Selection
+     */
     public fun <T> dialogSelector(
         title: String,
         options: List<T>,
@@ -126,9 +190,14 @@ public interface SettingsSectionScope {
         displayText: (T) -> String = { it.toString() },
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a vertical list of radio buttons for mutual exclusion.
+     * @category Selection
+     */
     public fun <T> radioButtonGroup(
         options: List<T>,
         selectedOption: T,
@@ -137,6 +206,10 @@ public interface SettingsSectionScope {
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a vertical list of checkboxes for multiple selection.
+     * @category Selection
+     */
     public fun <T> multiSelectList(
         options: List<T>,
         selectedOptions: Set<T>,
@@ -145,6 +218,10 @@ public interface SettingsSectionScope {
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a range slider for selecting a numeric interval.
+     * @category Sliders
+     */
     public fun rangeSlider(
         title: String,
         value: ClosedFloatingPointRange<Float>,
@@ -158,6 +235,10 @@ public interface SettingsSectionScope {
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a Material 3 Time Picker dialog.
+     * @category Pickers
+     */
     public fun timePicker(
         title: String,
         hour: Int,
@@ -166,18 +247,28 @@ public interface SettingsSectionScope {
         is24Hour: Boolean = true,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a Material 3 Date Picker dialog.
+     * @category Pickers
+     */
     public fun datePicker(
         title: String,
         selectedDateMillis: Long?,
         onDateSelected: (Long?) -> Unit,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a comprehensive color picker with HSV wheel and presets.
+     * @category Pickers
+     */
     public fun colorPicker(
         title: String,
         selectedColor: androidx.compose.ui.graphics.Color,
@@ -185,25 +276,42 @@ public interface SettingsSectionScope {
         colors: List<androidx.compose.ui.graphics.Color> = emptyList(),
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds small, centered footer text.
+     * @category Structure & Layout
+     */
     public fun footer(
         text: String,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a title/subtitle with a linear progress indicator.
+     * @category Structure & Layout
+     */
     public fun loading(
         title: String,
         subtitle: String? = null,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a small bold label to sub-divide items.
+     * @category Structure & Layout
+     */
     public fun subHeader(
         text: String,
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds an integrated search bar.
+     * @category Structure & Layout
+     */
     public fun searchBar(
         query: String,
         onQueryChange: (String) -> Unit,
@@ -211,6 +319,10 @@ public interface SettingsSectionScope {
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a standard slider for numeric selection.
+     * @category Sliders
+     */
     public fun slider(
         title: String,
         value: Float,
@@ -226,6 +338,10 @@ public interface SettingsSectionScope {
         sharedTransitionKey: Any? = null
     )
 
+    /**
+     * Adds a tag-based keyword editor.
+     * @category Input
+     */
     public fun keywordEditor(
         title: String,
         placeholder: String,

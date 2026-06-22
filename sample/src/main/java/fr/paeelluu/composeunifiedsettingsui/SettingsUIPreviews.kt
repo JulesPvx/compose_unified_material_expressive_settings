@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -197,7 +198,14 @@ private fun SettingsSectionScope.UserProfileSample() {
     userProfile(
         name = "Jules Pouvreaux",
         email = "jules@example.com",
-        onClick = {}
+        onClick = {},
+        trailingContent = {
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                shape = CircleShape,
+                modifier = Modifier.size(8.dp)
+            ) {}
+        }
     )
 }
 
@@ -216,7 +224,15 @@ private fun SettingsSectionScope.SwitchSample(checked: Boolean, onCheckedChange:
         subtitle = "Allow PC to discover this device",
         checked = checked,
         onCheckedChange = onCheckedChange,
-        icon = { Icon(Icons.Default.Bluetooth, contentDescription = null) }
+        icon = { Icon(Icons.Default.Bluetooth, contentDescription = null) },
+        trailingContent = {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Configure",
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
     )
 }
 

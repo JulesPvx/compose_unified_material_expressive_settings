@@ -117,6 +117,7 @@ internal class SettingsSectionScopeImpl(
         title: String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?,
         onClick: () -> Unit
     ) {
@@ -127,6 +128,7 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = onClick,
+                trailingContent = trailingContent,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 sharedTransitionKey = sharedTransitionKey
@@ -140,6 +142,7 @@ internal class SettingsSectionScopeImpl(
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -149,7 +152,15 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = { onCheckedChange(!checked) },
-                trailingContent = { Switch(checked = checked, onCheckedChange = onCheckedChange) },
+                trailingContent = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        trailingContent?.invoke()
+                        Switch(checked = checked, onCheckedChange = onCheckedChange)
+                    }
+                },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 sharedTransitionKey = sharedTransitionKey
@@ -163,6 +174,7 @@ internal class SettingsSectionScopeImpl(
         onCheckedChange: (Boolean) -> Unit,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -172,7 +184,15 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = { onCheckedChange(!checked) },
-                trailingContent = { Checkbox(checked = checked, onCheckedChange = onCheckedChange) },
+                trailingContent = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        trailingContent?.invoke()
+                        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+                    }
+                },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 sharedTransitionKey = sharedTransitionKey
@@ -188,6 +208,7 @@ internal class SettingsSectionScopeImpl(
         placeholder: String?,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         isError: Boolean,
         supportingText: String?,
         sharedTransitionKey: Any?
@@ -239,6 +260,7 @@ internal class SettingsSectionScopeImpl(
                                 )
                             }
                         }
+                        trailingContent?.invoke()
                     }
                     OutlinedTextField(
                         value = value,
@@ -260,6 +282,7 @@ internal class SettingsSectionScopeImpl(
         title: String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?,
         onClick: () -> Unit
     ) {
@@ -271,11 +294,17 @@ internal class SettingsSectionScopeImpl(
                 leadingContent = icon,
                 onClick = onClick,
                 trailingContent = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        trailingContent?.invoke()
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -359,6 +388,7 @@ internal class SettingsSectionScopeImpl(
         valueRange: IntRange,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -370,25 +400,31 @@ internal class SettingsSectionScopeImpl(
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        IconButton(
-                            onClick = { if (value > valueRange.first) onValueChange(value - 1) },
-                            enabled = value > valueRange.first
+                        trailingContent?.invoke()
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(Icons.Default.Remove, contentDescription = "Decrease")
-                        }
-                        Text(
-                            text = value.toString(),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.widthIn(min = 24.dp),
-                            textAlign = TextAlign.Center
-                        )
-                        IconButton(
-                            onClick = { if (value < valueRange.last) onValueChange(value + 1) },
-                            enabled = value < valueRange.last
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = "Increase")
+                            IconButton(
+                                onClick = { if (value > valueRange.first) onValueChange(value - 1) },
+                                enabled = value > valueRange.first
+                            ) {
+                                Icon(Icons.Default.Remove, contentDescription = "Decrease")
+                            }
+                            Text(
+                                text = value.toString(),
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.widthIn(min = 24.dp),
+                                textAlign = TextAlign.Center
+                            )
+                            IconButton(
+                                onClick = { if (value < valueRange.last) onValueChange(value + 1) },
+                                enabled = value < valueRange.last
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Increase")
+                            }
                         }
                     }
                 },
@@ -447,6 +483,7 @@ internal class SettingsSectionScopeImpl(
         name: String,
         email: String,
         avatar: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?,
         onClick: (() -> Unit)?
     ) {
@@ -471,6 +508,7 @@ internal class SettingsSectionScopeImpl(
                         }
                     }
                 },
+                trailingContent = trailingContent,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 sharedTransitionKey = sharedTransitionKey
@@ -481,6 +519,7 @@ internal class SettingsSectionScopeImpl(
     override fun expandableGroup(
         title: String,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?,
         content: SettingsSectionScope.() -> Unit
     ) {
@@ -507,11 +546,17 @@ internal class SettingsSectionScopeImpl(
                     leadingContent = icon,
                     onClick = { expanded = !expanded },
                     trailingContent = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            modifier = Modifier.rotate(expandedFraction * 180f)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            trailingContent?.invoke()
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                modifier = Modifier.rotate(expandedFraction * 180f)
+                            )
+                        }
                     },
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
@@ -564,6 +609,7 @@ internal class SettingsSectionScopeImpl(
         displayText: (T) -> String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -600,20 +646,26 @@ internal class SettingsSectionScopeImpl(
                     trailingContent = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Text(
-                                text = displayText(selectedOption),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.Center
-                            )
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Expand options",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.rotate(arrowRotation)
-                            )
+                            trailingContent?.invoke()
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = displayText(selectedOption),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textAlign = TextAlign.Center
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Expand options",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.rotate(arrowRotation)
+                                )
+                            }
                         }
                     },
                     sharedTransitionScope = sharedTransitionScope,
@@ -682,6 +734,7 @@ internal class SettingsSectionScopeImpl(
         displayText: (T) -> String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -694,11 +747,17 @@ internal class SettingsSectionScopeImpl(
                 leadingContent = icon,
                 onClick = { showDialog = true },
                 trailingContent = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        trailingContent?.invoke()
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -948,6 +1007,7 @@ internal class SettingsSectionScopeImpl(
         is24Hour: Boolean,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -965,7 +1025,13 @@ internal class SettingsSectionScopeImpl(
                 leadingContent = icon,
                 onClick = { showDialog = true },
                 trailingContent = {
-                    Icon(Icons.Default.TimeToLeave, contentDescription = null)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        trailingContent?.invoke()
+                        Icon(Icons.Default.TimeToLeave, contentDescription = null)
+                    }
                 },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -998,6 +1064,7 @@ internal class SettingsSectionScopeImpl(
         onDateSelected: (Long?) -> Unit,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -1012,7 +1079,13 @@ internal class SettingsSectionScopeImpl(
                 leadingContent = icon,
                 onClick = { showDialog = true },
                 trailingContent = {
-                    Icon(Icons.Default.DateRange, contentDescription = null)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        trailingContent?.invoke()
+                        Icon(Icons.Default.DateRange, contentDescription = null)
+                    }
                 },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -1046,6 +1119,7 @@ internal class SettingsSectionScopeImpl(
         colors: List<Color>,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        trailingContent: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
@@ -1069,12 +1143,18 @@ internal class SettingsSectionScopeImpl(
                 leadingContent = icon,
                 onClick = { showSheet = true },
                 trailingContent = {
-                    Surface(
-                        modifier = Modifier.size(28.dp),
-                        shape = CircleShape,
-                        color = selectedColor,
-                        border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
-                    ) {}
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        trailingContent?.invoke()
+                        Surface(
+                            modifier = Modifier.size(28.dp),
+                            shape = CircleShape,
+                            color = selectedColor,
+                            border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
+                        ) {}
+                    }
                 },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,

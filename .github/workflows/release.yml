@@ -81,3 +81,24 @@ jobs:
           gh release create ${{ env.TARGET_VERSION }} \
             --title "Release ${{ env.TARGET_VERSION }}" \
             --generate-notes
+
+      - name: Update Wiki Documentation
+        env:
+          WIKI_COMPONENTS_FILE: wiki/Components.md
+        run: |
+          # Checkout wiki repo
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+          
+          # Run the update script
+          python3 update_wiki_components.py
+          
+          # Commit and push changes
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Components.md
+          if git commit -m "docs: auto-update components for version ${{ env.TARGET_VERSION }}"; then
+            git push
+          else
+            echo "No changes to wiki documentation."
+          fi
