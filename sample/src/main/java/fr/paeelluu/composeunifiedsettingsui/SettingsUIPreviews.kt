@@ -391,11 +391,11 @@ private fun SettingsSectionScope.FooterSample() {
 private fun SettingsSectionScope.ItemSample() {
     item { shape ->
         Surface(
-            modifier = Modifier.size(100.dp, 40.dp),
+            modifier = Modifier.fillMaxWidth(),
             shape = shape,
             color = MaterialTheme.colorScheme.tertiaryContainer
         ) {
-            Text("Custom Raw Item", modifier = Modifier.padding(8.dp))
+            Text("Custom Raw Item", modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp))
         }
     }
 }

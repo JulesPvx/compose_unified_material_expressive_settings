@@ -1,3 +1,5 @@
+![Compose settings visualization](https://raw.githubusercontent.com/JulesPvx/compose_unified_material_expressive_settings/main/docs/assets/compose_settings_visualization.png)
+
 # Compose Unified Material Expressive Settings
 
 A Jetpack Compose library for building grouped settings screens with a modern Material 3 Expressive aesthetic. It features a declarative DSL, adaptive corner rounding, and native support for Shared Element Transitions.
