@@ -1470,6 +1470,7 @@ internal class SettingsSectionScopeImpl(
         showValue: Boolean,
         valueLabel: (Float) -> String,
         showMinMax: Boolean,
+        enablePreciseControls: Boolean,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         sharedTransitionKey: Any?
@@ -1531,22 +1532,64 @@ internal class SettingsSectionScopeImpl(
                         }
                     }
 
-                    Slider(
-                        value = value,
-                        onValueChange = onValueChange,
-                        onValueChangeFinished = onValueChangeFinished,
-                        valueRange = valueRange,
-                        steps = steps,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (enablePreciseControls) {
+                            IconButton(
+                                onClick = {
+                                    val step = if (steps > 0) (valueRange.endInclusive - valueRange.start) / (steps + 1) else (valueRange.endInclusive - valueRange.start) / 100f
+                                    onValueChange((value - step).coerceIn(valueRange))
+                                    onValueChangeFinished?.invoke()
+                                },
+                                enabled = value > valueRange.start,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Remove,
+                                    contentDescription = "Decrease",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+
+                        Slider(
+                            value = value,
+                            onValueChange = onValueChange,
+                            onValueChangeFinished = onValueChangeFinished,
+                            valueRange = valueRange,
+                            steps = steps,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(top = if (enablePreciseControls) 0.dp else 8.dp)
+                        )
+
+                        if (enablePreciseControls) {
+                            IconButton(
+                                onClick = {
+                                    val step = if (steps > 0) (valueRange.endInclusive - valueRange.start) / (steps + 1) else (valueRange.endInclusive - valueRange.start) / 100f
+                                    onValueChange((value + step).coerceIn(valueRange))
+                                    onValueChangeFinished?.invoke()
+                                },
+                                enabled = value < valueRange.endInclusive,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Increase",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
 
                     if (showMinMax) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
+                                .padding(horizontal = if (enablePreciseControls) 40.dp else 8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(

@@ -333,6 +333,7 @@ public interface SettingsSectionScope {
         showValue: Boolean = true,
         valueLabel: (Float) -> String = { it.toString() },
         showMinMax: Boolean = false,
+        enablePreciseControls: Boolean = false,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         sharedTransitionKey: Any? = null

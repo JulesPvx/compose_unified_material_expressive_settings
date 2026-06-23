@@ -155,6 +155,7 @@ fun FullSettingsScreenPreview() {
     var bluetoothEnabled by remember { mutableStateOf(true) }
     var selectedPerformance by remember { mutableStateOf("Balanced") }
     var volume by remember { mutableFloatStateOf(0.5f) }
+    var brightness by remember { mutableFloatStateOf(0.8f) }
     var accentColor by remember { mutableStateOf(Color(0xFF6E7FDC)) }
 
     MaterialTheme {
@@ -177,6 +178,7 @@ fun FullSettingsScreenPreview() {
                     SwitchSample(bluetoothEnabled) { bluetoothEnabled = it }
                     SegmentedButtonSample(selectedPerformance) { selectedPerformance = it }
                     SliderSample(volume) { volume = it }
+                    SliderPreciseSample(brightness) { brightness = it }
                 }
 
                 SettingsSection(title = "Customization") {
@@ -288,6 +290,18 @@ private fun SettingsSectionScope.SliderSample(value: Float, onValueChange: (Floa
         value = value,
         onValueChange = onValueChange,
         icon = { Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null) }
+    )
+}
+
+private fun SettingsSectionScope.SliderPreciseSample(value: Float, onValueChange: (Float) -> Unit) {
+    slider(
+        title = "Brightness",
+        subtitle = "Precise adjustment",
+        value = value,
+        onValueChange = onValueChange,
+        enablePreciseControls = true,
+        showMinMax = true,
+        icon = { Icon(Icons.Default.Settings, contentDescription = null) }
     )
 }
 
