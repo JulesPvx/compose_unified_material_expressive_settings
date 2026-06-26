@@ -1,3 +1,21 @@
+/*
+ * '||''''|                                                  ||                       .|'''.|            .     .    ||
+ *  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+ *  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+ *  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+ * .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+ *                    ||                                                                                                         .|....'
+ *                   ''''
+ *
+ * Copyright (c) 2026 Jules Pouvreaux
+ *
+ * /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/compose-settings-ui/build.gradle.kts
+ *
+ * This file is part of the Compose Unified Material Expressive Settings Library.
+ * Licensed under the Proprietary License.
+ * All rights reserved.
+ */
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)

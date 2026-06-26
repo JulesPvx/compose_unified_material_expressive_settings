@@ -1,3 +1,21 @@
+<!--
+  ~ '||''''|                                                  ||                       .|'''.|            .     .    ||
+  ~  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+  ~  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+  ~  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+  ~ .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+  ~                    ||                                                                                                         .|....'
+  ~                   ''''
+  ~
+  ~ Copyright (c) 2026 Jules Pouvreaux
+  ~
+  ~ /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/compose-settings-ui/src/main/res/values-night/themes.xml
+  ~
+  ~ This file is part of the Compose Unified Material Expressive Settings Library.
+  ~ Licensed under the Proprietary License.
+  ~ All rights reserved.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.ComposeUnifiedSettingsUI" parent="Theme.MaterialComponents.DayNight.DarkActionBar">

@@ -1,3 +1,21 @@
+/*
+ * '||''''|                                                  ||                       .|'''.|            .     .    ||
+ *  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+ *  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+ *  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+ * .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+ *                    ||                                                                                                         .|....'
+ *                   ''''
+ *
+ * Copyright (c) 2026 Jules Pouvreaux
+ *
+ * /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/compose-settings-ui/src/main/java/fr/paeelluu/compose_settings_ui/components/KeywordEditor.kt
+ *
+ * This file is part of the Compose Unified Material Expressive Settings Library.
+ * Licensed under the Proprietary License.
+ * All rights reserved.
+ */
+
 package fr.paeelluu.compose_settings_ui.components
 
 import androidx.compose.foundation.layout.Arrangement

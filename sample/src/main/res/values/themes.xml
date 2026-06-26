@@ -1,3 +1,21 @@
+<!--
+  ~ '||''''|                                                  ||                       .|'''.|            .     .    ||
+  ~  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+  ~  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+  ~  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+  ~ .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+  ~                    ||                                                                                                         .|....'
+  ~                   ''''
+  ~
+  ~ Copyright (c) 2026 Jules Pouvreaux
+  ~
+  ~ /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/sample/src/main/res/values/themes.xml
+  ~
+  ~ This file is part of the Compose Unified Material Expressive Settings Library.
+  ~ Licensed under the Proprietary License.
+  ~ All rights reserved.
+  -->
+
 <resources>
     <style name="Theme.ComposeUnifiedSettingsUI" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar"/>
 </resources>

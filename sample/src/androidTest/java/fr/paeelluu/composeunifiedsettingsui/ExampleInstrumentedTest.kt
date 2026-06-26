@@ -1,3 +1,21 @@
+/*
+ * '||''''|                                                  ||                       .|'''.|            .     .    ||
+ *  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+ *  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+ *  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+ * .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+ *                    ||                                                                                                         .|....'
+ *                   ''''
+ *
+ * Copyright (c) 2026 Jules Pouvreaux
+ *
+ * /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/sample/src/androidTest/java/fr/paeelluu/composeunifiedsettingsui/ExampleInstrumentedTest.kt
+ *
+ * This file is part of the Compose Unified Material Expressive Settings Library.
+ * Licensed under the Proprietary License.
+ * All rights reserved.
+ */
+
 package fr.paeelluu.composeunifiedsettingsui
 
 import androidx.test.platform.app.InstrumentationRegistry

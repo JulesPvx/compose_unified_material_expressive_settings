@@ -1,3 +1,21 @@
+<!--
+  ~ '||''''|                                                  ||                       .|'''.|            .     .    ||
+  ~  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+  ~  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+  ~  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+  ~ .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+  ~                    ||                                                                                                         .|....'
+  ~                   ''''
+  ~
+  ~ Copyright (c) 2026 Jules Pouvreaux
+  ~
+  ~ /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/sample/src/main/res/values/strings.xml
+  ~
+  ~ This file is part of the Compose Unified Material Expressive Settings Library.
+  ~ Licensed under the Proprietary License.
+  ~ All rights reserved.
+  -->
+
 <resources>
     <string name="app_name">ComposeUnifiedSettingsUI</string>
 </resources>

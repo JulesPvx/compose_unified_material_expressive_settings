@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ '||''''|                                                  ||                       .|'''.|            .     .    ||
+  ~  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+  ~  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+  ~  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+  ~ .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+  ~                    ||                                                                                                         .|....'
+  ~                   ''''
+  ~
+  ~ Copyright (c) 2026 Jules Pouvreaux
+  ~
+  ~ /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/sample/src/main/res/drawable/ic_launcher_background.xml
+  ~
+  ~ This file is part of the Compose Unified Material Expressive Settings Library.
+  ~ Licensed under the Proprietary License.
+  ~ All rights reserved.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:height="108dp"
     android:width="108dp"

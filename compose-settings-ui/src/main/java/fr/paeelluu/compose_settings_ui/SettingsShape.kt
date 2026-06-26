@@ -1,14 +1,17 @@
 /*
- *      e            888                               d8   ,e,
- *     d8b      e88~\888 888  888 888-~88e   /~~~8e  _d88__  "   e88~-_
- *    /Y88b    d888  888 888  888 888  888       88b  888   888 d888   i
- *   /  Y88b   8888  888 888  888 888  888  e88~-888  888   888 8888   |
- *  /____Y88b  Y888  888 888  888 888  888 C888  888  888   888 Y888   '
- * /      Y88b  "88_/888 "88_-888 888  888  "88_-888  "88_/ 888  "88_-~
+ * '||''''|                                                  ||                       .|'''.|            .     .    ||
+ *  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+ *  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+ *  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+ * .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+ *                    ||                                                                                                         .|....'
+ *                   ''''
  *
  * Copyright (c) 2026 Jules Pouvreaux
  *
- * This file is part of Adunatio.
+ * /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/compose-settings-ui/src/main/java/fr/paeelluu/compose_settings_ui/SettingsShape.kt
+ *
+ * This file is part of the Compose Unified Material Expressive Settings Library.
  * Licensed under the Proprietary License.
  * All rights reserved.
  */

@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ '||''''|                                                  ||                       .|'''.|            .     .    ||
+  ~  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+  ~  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+  ~  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+  ~ .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
+  ~                    ||                                                                                                         .|....'
+  ~                   ''''
+  ~
+  ~ Copyright (c) 2026 Jules Pouvreaux
+  ~
+  ~ /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/compose-settings-ui/src/main/res/values/colors.xml
+  ~
+  ~ This file is part of the Compose Unified Material Expressive Settings Library.
+  ~ Licensed under the Proprietary License.
+  ~ All rights reserved.
+  -->
+
 <resources>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
