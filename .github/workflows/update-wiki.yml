@@ -1,0 +1,36 @@
+name: Update Wiki
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to use for documentation'
+        required: true
+        type: string
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update Wiki Documentation
+        env:
+          TARGET_VERSION: ${{ inputs.version }}
+          WIKI_COMPONENTS_FILE: wiki/Components.md
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+          python3 "$GITHUB_WORKSPACE/update_wiki_components.py"
+          
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Home.md Components.md images/
+          if git commit -m "docs: auto-update components for version ${{ env.TARGET_VERSION }}"; then
+            git push
+          else
+            echo "No changes to wiki documentation."
+          fi

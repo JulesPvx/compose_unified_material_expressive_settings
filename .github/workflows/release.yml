@@ -87,22 +87,15 @@ jobs:
             --title "Release ${{ env.TARGET_VERSION }}" \
             --generate-notes
 
-      - name: Update Wiki Documentation
-        env:
-          WIKI_COMPONENTS_FILE: wiki/Components.md
-        run: |
-          SCRIPT_PATH="$GITHUB_WORKSPACE/update_wiki_components.py"
-          
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
-          
-          python3 "$SCRIPT_PATH"
-          
-          cd wiki
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Home.md Components.md images/
-          if git commit -m "docs: auto-update components and version for version ${{ env.TARGET_VERSION }}"; then
-            git push
-          else
-            echo "No changes to wiki documentation."
-          fi
+      - name: Trigger Wiki Update
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'update-wiki.yml',
+              ref: 'main',
+              inputs: { version: '${{ env.TARGET_VERSION }}' }
+            })
