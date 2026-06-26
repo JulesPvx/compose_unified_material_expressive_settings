@@ -53,7 +53,7 @@ class SettingsItemScreenshots {
             MaterialTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     LazyColumn {
-                        settingsSection(title = "Test", content = content)
+                        settingsSection(content = content)
                     }
                 }
             }
