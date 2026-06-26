@@ -17,6 +17,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Generate Fresh Screenshots
+        run: ./gradlew :sample:recordPaparazziDebug
+
       - name: Update Wiki Documentation
         env:
           TARGET_VERSION: ${{ inputs.version }}
