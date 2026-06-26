@@ -1,4 +1,4 @@
-![Compose settings visualization](https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/7942f0599aced178c0e21a967372162aefa5426e/docs/assets/cover.png)
+![Compose settings visualization](https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/7693c0c663202a8f6646c625444a0534690fb13b/docs/assets/cover.png)
 
 # Compose Unified Material Expressive Settings
 
