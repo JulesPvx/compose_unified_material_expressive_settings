@@ -57,13 +57,16 @@ jobs:
           sed -i -E "s/(composeSettings = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
           sed -i -E "s/(io\.github\.julespvx:compose-settings-ui:)[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
 
+      - name: Record Paparazzi Screenshots
+        run: ./gradlew recordPaparazzi --no-daemon
+
       - name: Commit and Push Changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add gradle/libs.versions.toml README.md
+          git add gradle/libs.versions.toml README.md sample/src/test/snapshots
           if ! git diff --cached --quiet; then
-            git commit -m "chore: update version to ${{ env.TARGET_VERSION }}"
+            git commit -m "chore: update version to ${{ env.TARGET_VERSION }} and refresh screenshots"
             git push
           fi
 
@@ -98,7 +101,7 @@ jobs:
           cd wiki
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Components.md
+          git add Components.md images/
           if git commit -m "docs: auto-update components for version ${{ env.TARGET_VERSION }}"; then
             git push
           else

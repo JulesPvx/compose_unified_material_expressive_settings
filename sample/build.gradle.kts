@@ -19,6 +19,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.paparazzi)
 }
 
 android {
@@ -59,7 +60,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.compose.material.icons.extended.android)
