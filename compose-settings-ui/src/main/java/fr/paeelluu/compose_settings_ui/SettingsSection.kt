@@ -34,9 +34,14 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Extension on [LazyListScope] to add a settings section with a title and grouped items.
+ * @param title The title of the section.
+ * @param enabled Whether the section is enabled.
+ * @param sharedTransitionScope The shared transition scope for the section.
+ * @param animatedVisibilityScope The animated visibility scope for the section.
+ * @param content The DSL for defining the items within the section.
  */
 public fun LazyListScope.settingsSection(
-    title: String,
+    title: String? = null,
     enabled: Boolean = true,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -51,16 +56,18 @@ public fun LazyListScope.settingsSection(
 
     val titleAlpha = if (enabled) 1f else 0.38f
 
-    item(key = "section_title_$title") {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = titleAlpha),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(top = 16.dp, bottom = 8.dp)
-        )
+    if (title != null) {
+        item(key = "section_title_${title}") {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = titleAlpha),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 16.dp, bottom = 8.dp)
+            )
+        }
     }
 
     itemsIndexed(

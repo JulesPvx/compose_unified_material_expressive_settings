@@ -59,7 +59,7 @@ public fun SettingsItemBase(
     val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
         with(sharedTransitionScope) {
             Modifier.sharedBounds(
-                rememberSharedContentState(key = sharedTransitionKey),
+                sharedContentState = rememberSharedContentState(key = sharedTransitionKey),
                 animatedVisibilityScope = animatedVisibilityScope
             )
         }
