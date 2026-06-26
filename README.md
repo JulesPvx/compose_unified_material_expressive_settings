@@ -1,4 +1,4 @@
-![Compose settings visualization](https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/7942f0599aced178c0e21a967372162aefa5426e/docs/assets/cover.png)
+![Compose settings visualization](https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/7693c0c663202a8f6646c625444a0534690fb13b/docs/assets/cover.png)
 
 # Compose Unified Material Expressive Settings
 
@@ -66,9 +66,9 @@ LazyColumn(modifier = Modifier.fillMaxSize()) {
 
 For a comprehensive guide, component catalog, and advanced usage examples, please visit the **[Project Wiki](https://github.com/paeelluu/compose_unified_material_expressive_settings/wiki)**.
 
-- **[Component Catalog](https://github.com/paeelluu/compose_unified_material_expressive_settings/wiki/Components)**: Code examples for all 20+ components.
-- **[Theming](https://github.com/paeelluu/compose_unified_material_expressive_settings/wiki/Theming)**: Material 3 token mapping and shape logic.
-- **[Advanced Usage](https://github.com/paeelluu/compose_unified_material_expressive_settings/wiki/Advanced-Usage)**: Shared transitions and custom items.
+- **[Component Catalog](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki/Components)**: Code examples for all 20+ components.
+- **[Theming](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki/Theming)**: Material 3 token mapping and shape logic.
+- **[Advanced Usage](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki/Advanced-Usage)**: Shared transitions and custom items.
 
 ## License
 
