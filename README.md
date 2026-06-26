@@ -41,22 +41,24 @@ dependencies {
 ## Quick Start
 
 ```kotlin
-SettingsSection(title = "App Preferences") {
-    switch(
-        title = "Dark Mode",
-        checked = isDarkMode,
-        onCheckedChange = { isDarkMode = it },
-        icon = { Icon(Icons.Default.Brightness4, null) }
-    )
-    
-    selector(
-        title = "Language",
-        options = listOf("English", "French", "Spanish"),
-        selectedOption = language,
-        onOptionSelected = { language = it }
-    )
-    
-    link(title = "Privacy Policy", onClick = { /* ... */ })
+LazyColumn(modifier = Modifier.fillMaxSize()) {
+    settingsSection(title = "App Preferences") {
+        switch(
+            title = "Dark Mode",
+            checked = isDarkMode,
+            onCheckedChange = { isDarkMode = it },
+            icon = { Icon(Icons.Default.Brightness4, null) }
+        )
+        
+        selector(
+            title = "Language",
+            options = listOf("English", "French", "Spanish"),
+            selectedOption = language,
+            onOptionSelected = { language = it }
+        )
+        
+        link(title = "Privacy Policy", onClick = { /* ... */ })
+    }
 }
 ```
 
