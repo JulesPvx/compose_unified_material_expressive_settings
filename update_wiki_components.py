@@ -8,8 +8,6 @@
 #
 #  Copyright (c) 2026 Jules Pouvreaux
 #
-#  /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/update_wiki_components.py
-#
 #  This file is part of the Compose Unified Material Expressive Settings Library.
 #  Licensed under the Proprietary License.
 #  All rights reserved.
@@ -17,6 +15,7 @@
 import os
 import re
 import shutil
+import time
 
 WIKI_PATH = "wiki"
 COMPONENTS_FILE = os.path.join(WIKI_PATH, "Components.md")
@@ -71,7 +70,7 @@ def update_home_version():
     pattern = r'implementation\("fr\.paeelluu:compose-settings-ui:[^"]*"\)'
     replacement = f'implementation("fr.paeelluu:compose-settings-ui:{target_version}")'
     new_content = re.sub(pattern, replacement, content)
-    
+
     if new_content != content:
         with open(HOME_FILE, 'w') as f:
             f.write(new_content)
@@ -86,15 +85,15 @@ def parse_kdoc():
         content = f.read()
 
     kdoc_pattern = re.compile(r'/\*\*(.*?)\*/\s+(?:public|private|internal|protected)?\s+(?:inline|tailrec|external|suspend|abstract|override|open|final)?\s*fun\s+(?:<.*?>\s+)?(\w+)', re.DOTALL)
-    
+
     components = {}
     for kdoc, fun_name in kdoc_pattern.findall(content):
         lines = [line.strip().lstrip('*').strip() for line in kdoc.strip().split('\n')]
-        
+
         description = []
         params = []
         category = "Other"
-        
+
         for line in lines:
             if line.startswith("@param"):
                 params.append(line.replace("@param", "").strip())
@@ -103,13 +102,13 @@ def parse_kdoc():
             elif not line.startswith("@"):
                 if line:
                     description.append(line)
-        
+
         components[fun_name] = {
             "description": "\n".join(description),
             "params": params,
             "category": category
         }
-    
+
     return components
 
 def update_components_docs():
@@ -121,8 +120,9 @@ def update_components_docs():
     if not os.path.exists(wiki_images_path):
         os.makedirs(wiki_images_path)
 
+    unique_id = int(time.time())
     prefix = "fr.paeelluu.composeunifiedsettingsui_SettingsItemScreenshots_"
-    
+
     categories = {}
     for name, data in kdoc_data.items():
         cat = data["category"]
@@ -131,7 +131,7 @@ def update_components_docs():
         categories[cat].append((name, data))
 
     new_content = "# Components Catalog\n\nAll components are available within the `SettingsSectionScope`.\n\n"
-    
+
     ordered_categories = ["Basic Actions", "Toggles", "Input", "Selection", "Sliders", "Pickers", "Structure & Layout"]
     for cat in categories.keys():
         if cat not in ordered_categories:
@@ -140,24 +140,25 @@ def update_components_docs():
     for cat in ordered_categories:
         if cat not in categories:
             continue
-            
+
         new_content += f"## {cat}\n\n"
-        
+
         for name, data in categories[cat]:
             new_content += f"### {name}\n"
-            
+
             snapshot_suffix = COMPONENT_MAPPING.get(name)
             if snapshot_suffix:
-                snapshot_file = f"{prefix}{snapshot_suffix}.png"
-                src_path = os.path.join(SNAPSHOTS_PATH, snapshot_file)
+                # Add unique_id to filename to bust cache
+                snapshot_file = f"{prefix}{snapshot_suffix}_{unique_id}.png"
+                src_path = os.path.join(SNAPSHOTS_PATH, f"{prefix}{snapshot_suffix}.png")
                 dst_path = os.path.join(wiki_images_path, snapshot_file)
-                
+
                 if os.path.exists(src_path):
                     shutil.copy(src_path, dst_path)
                     new_content += f"![Preview](images/{snapshot_file})\n\n"
-            
+
             new_content += f"{data['description']}\n\n"
-            
+
             if data['params']:
                 new_content += "**Parameters:**\n\n"
                 new_content += "| Name | Description |\n"
@@ -169,12 +170,12 @@ def update_components_docs():
                     else:
                         new_content += f"| `{parts[0]}` | - |\n"
                 new_content += "\n"
-        
+
         new_content += "---\n\n"
 
     with open(COMPONENTS_FILE, 'w') as f:
         f.write(new_content)
-    print("Updated Components.md from KDoc.")
+    print("Updated Components.md from KDoc with unique image IDs.")
 
 if __name__ == "__main__":
     update_home_version()
