@@ -51,8 +51,10 @@ class SettingsItemScreenshots {
     private fun snapshot(content: SettingsSectionScope.() -> Unit) {
         paparazzi.snapshot {
             MaterialTheme {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    LazyColumn {
+                Surface(color = Color.Transparent) {
+                    LazyColumn(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
                         settingsSection(content = content)
                     }
                 }
