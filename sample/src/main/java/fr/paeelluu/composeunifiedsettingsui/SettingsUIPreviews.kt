@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,9 +46,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import fr.paeelluu.compose_settings_ui.SettingsSection
+import fr.paeelluu.compose_settings_ui.settingsSection
 import fr.paeelluu.compose_settings_ui.SettingsSectionScope
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -64,13 +68,13 @@ fun SharedTransitionSamplePreview() {
                     Scaffold(
                         topBar = { TopAppBar(title = { Text("Settings") }) }
                     ) { innerPadding ->
-                        Column(
+                        LazyColumn(
                             modifier = Modifier
                                 .padding(innerPadding)
                                 .fillMaxSize()
                                 .padding(16.dp)
                         ) {
-                            SettingsSection(
+                            settingsSection(
                                 title = "Shared Transitions",
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 animatedVisibilityScope = this@AnimatedContent
@@ -149,6 +153,123 @@ fun SharedTransitionSamplePreview() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun FullScreenSearchSamplePreview() {
+    var searchQuery by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val allItems = remember {
+        listOf("Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape")
+    }
+    val filteredItems = remember(searchQuery) {
+        allItems.filter { it.contains(searchQuery, ignoreCase = true) }
+    }
+
+    MaterialTheme {
+        Scaffold { innerPadding ->
+            LazyColumn(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
+                settingsSection(title = "Full Screen Search") {
+                    fullScreenSearch(
+                        query = searchQuery,
+                        onQueryChange = { searchQuery = it },
+                        onSearch = { expanded = false },
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        placeholder = "Search fruits...",
+                        content = {
+                            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                                items(filteredItems) { item ->
+                                    Text(
+                                        text = item,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { 
+                                                searchQuery = item
+                                                expanded = false 
+                                            }
+                                            .padding(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    )
+                    
+                    if (searchQuery.isNotEmpty()) {
+                        item {
+                            Text("Selected fruit: $searchQuery", modifier = Modifier.padding(16.dp))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SearchableSettingsPreview() {
+    var searchQuery by remember { mutableStateOf("") }
+    val allItems = remember {
+        listOf(
+            "Bluetooth" to "Connect to wireless devices",
+            "Wi-Fi" to "Manage internet connections",
+            "Display" to "Brightness, sleep, font size",
+            "Battery" to "Power saving, usage statistics",
+            "Storage" to "Manage apps and files",
+            "Security" to "Screen lock, fingerprint, face unlock",
+        )
+    }
+
+    val filteredItems = remember(searchQuery) {
+        allItems.filter {
+            it.first.contains(searchQuery, ignoreCase = true) ||
+                    it.second.contains(searchQuery, ignoreCase = true)
+        }
+    }
+
+    MaterialTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+                settingsSection(title = "Searchable Settings") {
+                    searchBar(
+                        query = searchQuery,
+                        onQueryChange = { searchQuery = it },
+                        placeholder = "Search settings..."
+                    )
+
+                    filteredItems.forEach { (title, subtitle) ->
+                        action(title = title, subtitle = subtitle, onClick = {})
+                    }
+
+                    if (filteredItems.isEmpty()) {
+                        item { shape ->
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = shape,
+                                color = MaterialTheme.colorScheme.surfaceContainer
+                            ) {
+                                Text(
+                                    text = "No results found for \"$searchQuery\"",
+                                    modifier = Modifier.padding(24.dp),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 fun FullSettingsScreenPreview() {
@@ -157,37 +278,71 @@ fun FullSettingsScreenPreview() {
     var volume by remember { mutableFloatStateOf(0.5f) }
     var brightness by remember { mutableFloatStateOf(0.8f) }
     var accentColor by remember { mutableStateOf(Color(0xFF6E7FDC)) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val sections = remember {
+        listOf("Account", "System", "Customization", "About")
+    }
+
+    val filteredSections = remember(searchQuery) {
+        sections.filter { it.contains(searchQuery, ignoreCase = true) }
+    }
 
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                SettingsSection(title = "Account") {
-                    UserProfileSample()
-                    ActionSample()
+                settingsSection(title = "Search") {
+                    searchBar(
+                        query = searchQuery,
+                        onQueryChange = { searchQuery = it },
+                        placeholder = "Search settings..."
+                    )
                 }
 
-                SettingsSection(title = "System") {
-                    SwitchSample(bluetoothEnabled) { bluetoothEnabled = it }
-                    SegmentedButtonSample(selectedPerformance) { selectedPerformance = it }
-                    SliderSample(volume) { volume = it }
-                    SliderPreciseSample(brightness) { brightness = it }
+                if (filteredSections.contains("Account")) {
+                    settingsSection(title = "Account") {
+                        UserProfileSample()
+                        ActionSample()
+                    }
                 }
 
-                SettingsSection(title = "Customization") {
-                    ColorPickerSample(accentColor) { accentColor = it }
-                    ExpandableGroupSample()
+                if (filteredSections.contains("System")) {
+                    settingsSection(title = "System") {
+                        SwitchSample(bluetoothEnabled) { bluetoothEnabled = it }
+                        SegmentedButtonSample(selectedPerformance) { selectedPerformance = it }
+                        SliderSample(volume) { volume = it }
+                        SliderPreciseSample(brightness) { brightness = it }
+                    }
                 }
 
-                SettingsSection(title = "About") {
-                    FooterSample()
+                if (filteredSections.contains("Customization")) {
+                    settingsSection(title = "Customization") {
+                        ColorPickerSample(accentColor) { accentColor = it }
+                        ExpandableGroupSample()
+                    }
+                }
+
+                if (searchQuery.isEmpty()) {
+                    settingsSection(
+                        title = "Disabled Section",
+                        enabled = false
+                    ) {
+                        switch(title = "Disabled Switch", checked = true, onCheckedChange = {})
+                        slider(title = "Disabled Slider", value = 0.5f, onValueChange = {})
+                        action(title = "Disabled Action", onClick = {})
+                    }
+                }
+
+                if (filteredSections.contains("About")) {
+                    settingsSection(title = "About") {
+                        FooterSample()
+                    }
                 }
             }
         }
@@ -423,11 +578,13 @@ private fun BasicComponentsPreview() {
     var checkboxState by remember { mutableStateOf(false) }
 
     MaterialTheme {
-        SettingsSection(title = "Basic Controls", modifier = Modifier.padding(16.dp)) {
-            ActionSample()
-            SwitchSample(switchState) { switchState = it }
-            CheckboxSample(checkboxState) { checkboxState = it }
-            LinkSample()
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            settingsSection(title = "Basic Controls") {
+                ActionSample()
+                SwitchSample(switchState) { switchState = it }
+                CheckboxSample(checkboxState) { checkboxState = it }
+                LinkSample()
+            }
         }
     }
 }
@@ -440,10 +597,12 @@ private fun InputComponentsPreview() {
     var keywords by remember { mutableStateOf(listOf("Compose")) }
 
     MaterialTheme {
-        SettingsSection(title = "Inputs", modifier = Modifier.padding(16.dp)) {
-            TextFieldSample(text) { text = it }
-            StepperSample(count) { count = it }
-            KeywordEditorSample(keywords, { keywords = keywords + it }, { keywords = keywords - it })
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            settingsSection(title = "Inputs") {
+                TextFieldSample(text) { text = it }
+                StepperSample(count) { count = it }
+                KeywordEditorSample(keywords, { keywords = keywords + it }, { keywords = keywords - it })
+            }
         }
     }
 }
@@ -456,10 +615,12 @@ private fun SelectionComponentsPreview() {
     var dialSelected by remember { mutableStateOf("English") }
 
     MaterialTheme {
-        SettingsSection(title = "Selection", modifier = Modifier.padding(16.dp)) {
-            SegmentedButtonSample(segSelected) { segSelected = it }
-            SelectorSample(selSelected) { selSelected = it }
-            DialogSelectorSample(dialSelected) { dialSelected = it }
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            settingsSection(title = "Selection") {
+                SegmentedButtonSample(segSelected) { segSelected = it }
+                SelectorSample(selSelected) { selSelected = it }
+                DialogSelectorSample(dialSelected) { dialSelected = it }
+            }
         }
     }
 }
@@ -472,10 +633,12 @@ private fun SpecializedComponentsPreview() {
     var range by remember { mutableStateOf(0.2f..0.8f) }
 
     MaterialTheme {
-        SettingsSection(title = "Specialized", modifier = Modifier.padding(16.dp)) {
-            ColorPickerSample(color) { color = it }
-            SliderSample(vol) { vol = it }
-            RangeSliderSample(range) { range = it }
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            settingsSection(title = "Specialized") {
+                ColorPickerSample(color) { color = it }
+                SliderSample(vol) { vol = it }
+                RangeSliderSample(range) { range = it }
+            }
         }
     }
 }
@@ -488,13 +651,15 @@ private fun AdvancedComponentsPreview() {
     var multiSelected by remember { mutableStateOf(setOf("Email")) }
 
     MaterialTheme {
-        SettingsSection(title = "Advanced & Feedback", modifier = Modifier.padding(16.dp)) {
-            SearchBarSample(query) { query = it }
-            RadioGroupSample(radioSelected) { radioSelected = it }
-            MultiSelectListSample(multiSelected) { multiSelected = it }
-            InfoSample()
-            LoadingSample()
-            ItemSample()
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            settingsSection(title = "Advanced & Feedback") {
+                SearchBarSample(query) { query = it }
+                RadioGroupSample(radioSelected) { radioSelected = it }
+                MultiSelectListSample(multiSelected) { multiSelected = it }
+                InfoSample()
+                LoadingSample()
+                ItemSample()
+            }
         }
     }
 }

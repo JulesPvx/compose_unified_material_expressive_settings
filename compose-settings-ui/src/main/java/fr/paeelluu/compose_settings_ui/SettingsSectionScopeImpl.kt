@@ -7,12 +7,14 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -63,6 +65,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -74,6 +77,7 @@ import androidx.compose.material3.ToggleButtonColors
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,8 +87,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
@@ -105,7 +112,8 @@ import java.util.Locale
 @OptIn(ExperimentalSharedTransitionApi::class)
 internal class SettingsSectionScopeImpl(
     private val sharedTransitionScope: SharedTransitionScope? = null,
-    private val animatedVisibilityScope: AnimatedVisibilityScope? = null
+    private val animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    private val sectionEnabled: Boolean = true
 ) : SettingsSectionScope {
     internal val items = mutableListOf<@Composable (Shape) -> Unit>()
 
@@ -118,6 +126,7 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?,
         onClick: () -> Unit
     ) {
@@ -128,6 +137,7 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = onClick,
+                enabled = sectionEnabled && enabled,
                 trailingContent = trailingContent,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -143,22 +153,25 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             SettingsItemBase(
                 title = title,
                 subtitle = subtitle,
                 shape = shape,
                 leadingContent = icon,
                 onClick = { onCheckedChange(!checked) },
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         trailingContent?.invoke()
-                        Switch(checked = checked, onCheckedChange = onCheckedChange)
+                        Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = isEnabled)
                     }
                 },
                 sharedTransitionScope = sharedTransitionScope,
@@ -175,22 +188,25 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             SettingsItemBase(
                 title = title,
                 subtitle = subtitle,
                 shape = shape,
                 leadingContent = icon,
                 onClick = { onCheckedChange(!checked) },
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         trailingContent?.invoke()
-                        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+                        Checkbox(checked = checked, onCheckedChange = onCheckedChange, enabled = isEnabled)
                     }
                 },
                 sharedTransitionScope = sharedTransitionScope,
@@ -209,11 +225,14 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         isError: Boolean,
         supportingText: String?,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
+            val alpha = if (isEnabled) 1f else 0.38f
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -242,7 +261,11 @@ internal class SettingsSectionScopeImpl(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (icon != null) {
-                            Box(modifier = Modifier.padding(end = 16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 16.dp)
+                                    .then(if (!isEnabled) Modifier.alpha(alpha) else Modifier)
+                            ) {
                                 icon()
                             }
                         }
@@ -250,17 +273,21 @@ internal class SettingsSectionScopeImpl(
                             Text(
                                 text = title,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
                             )
                             if (subtitle != null) {
                                 Text(
                                     text = subtitle,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
                                 )
                             }
                         }
-                        trailingContent?.invoke()
+                        if (trailingContent != null) {
+                            Box(modifier = Modifier.then(if (!isEnabled) Modifier.alpha(alpha) else Modifier)) {
+                                trailingContent()
+                            }
+                        }
                     }
                     OutlinedTextField(
                         value = value,
@@ -268,6 +295,7 @@ internal class SettingsSectionScopeImpl(
                         label = label?.let { { Text(it) } },
                         placeholder = placeholder?.let { { Text(it) } },
                         isError = isError,
+                        enabled = isEnabled,
                         supportingText = supportingText?.let { { Text(it) } },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -283,16 +311,19 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?,
         onClick: () -> Unit
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             SettingsItemBase(
                 title = title,
                 subtitle = subtitle,
                 shape = shape,
                 leadingContent = icon,
                 onClick = onClick,
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -319,9 +350,11 @@ internal class SettingsSectionScopeImpl(
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -354,6 +387,7 @@ internal class SettingsSectionScopeImpl(
                         ToggleButton(
                             checked = option == selectedOption,
                             onCheckedChange = { onOptionSelected(option) },
+                            enabled = isEnabled,
                             shapes = when (index) {
                                 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
                                 options.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
@@ -364,6 +398,8 @@ internal class SettingsSectionScopeImpl(
                                 checkedContainerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                                 checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.12f),
+                                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                             ),
                             modifier = Modifier
                                 .semantics { role = Role.RadioButton }
@@ -389,14 +425,17 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             SettingsItemBase(
                 title = title,
                 subtitle = subtitle,
                 shape = shape,
                 leadingContent = icon,
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -409,7 +448,7 @@ internal class SettingsSectionScopeImpl(
                         ) {
                             IconButton(
                                 onClick = { if (value > valueRange.first) onValueChange(value - 1) },
-                                enabled = value > valueRange.first
+                                enabled = isEnabled && value > valueRange.first
                             ) {
                                 Icon(Icons.Default.Remove, contentDescription = "Decrease")
                             }
@@ -421,7 +460,7 @@ internal class SettingsSectionScopeImpl(
                             )
                             IconButton(
                                 onClick = { if (value < valueRange.last) onValueChange(value + 1) },
-                                enabled = value < valueRange.last
+                                enabled = isEnabled && value < valueRange.last
                             ) {
                                 Icon(Icons.Default.Add, contentDescription = "Increase")
                             }
@@ -484,15 +523,18 @@ internal class SettingsSectionScopeImpl(
         email: String,
         avatar: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?,
         onClick: (() -> Unit)?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             SettingsItemBase(
                 title = name,
                 subtitle = email,
                 shape = shape,
                 onClick = onClick,
+                enabled = isEnabled,
                 leadingContent = avatar ?: {
                     Surface(
                         shape = CircleShape,
@@ -520,10 +562,12 @@ internal class SettingsSectionScopeImpl(
         title: String,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?,
         content: SettingsSectionScope.() -> Unit
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             var expanded by remember { mutableStateOf(false) }
             val expandedFraction by animateFloatAsState(
                 targetValue = if (expanded) 1f else 0f,
@@ -545,6 +589,7 @@ internal class SettingsSectionScopeImpl(
                     shape = headerShape,
                     leadingContent = icon,
                     onClick = { expanded = !expanded },
+                    enabled = isEnabled,
                     trailingContent = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -570,7 +615,8 @@ internal class SettingsSectionScopeImpl(
                 ) {
                     val innerScope = SettingsSectionScopeImpl(
                         sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        sectionEnabled = isEnabled
                     )
                     innerScope.content()
 
@@ -610,9 +656,11 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             var expanded by remember { mutableStateOf(false) }
 
             val expandedFraction by animateFloatAsState(
@@ -643,6 +691,7 @@ internal class SettingsSectionScopeImpl(
                     shape = headerShape,
                     leadingContent = icon,
                     onClick = { expanded = !expanded },
+                    enabled = isEnabled,
                     trailingContent = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -656,7 +705,7 @@ internal class SettingsSectionScopeImpl(
                                 Text(
                                     text = displayText(selectedOption),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = if (isEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.38f),
                                     textAlign = TextAlign.Center
                                 )
                                 Icon(
@@ -705,6 +754,7 @@ internal class SettingsSectionScopeImpl(
                                     onOptionSelected(option)
                                     expanded = false
                                 },
+                                enabled = isEnabled,
                                 leadingContent = {
                                     Spacer(modifier = Modifier.width(24.dp))
                                 },
@@ -735,9 +785,11 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             var showDialog by remember { mutableStateOf(false) }
 
             SettingsItemBase(
@@ -746,6 +798,7 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = { showDialog = true },
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -809,9 +862,12 @@ internal class SettingsSectionScopeImpl(
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
+            val alpha = if (isEnabled) 1f else 0.38f
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -835,19 +891,20 @@ internal class SettingsSectionScopeImpl(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onOptionSelected(option) }
+                                .clickable(enabled = isEnabled) { onOptionSelected(option) }
                                 .padding(horizontal = 24.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
                                 selected = option == selectedOption,
-                                onClick = null
+                                onClick = null,
+                                enabled = isEnabled
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 text = displayText(option),
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
                             )
                         }
                     }
@@ -861,9 +918,12 @@ internal class SettingsSectionScopeImpl(
         selectedOptions: Set<T>,
         onSelectionChange: (Set<T>) -> Unit,
         displayText: (T) -> String,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
+            val alpha = if (isEnabled) 1f else 0.38f
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -888,7 +948,7 @@ internal class SettingsSectionScopeImpl(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
+                                .clickable(enabled = isEnabled) {
                                     val newSelection = if (isChecked) {
                                         selectedOptions - option
                                     } else {
@@ -901,13 +961,14 @@ internal class SettingsSectionScopeImpl(
                         ) {
                             Checkbox(
                                 checked = isChecked,
-                                onCheckedChange = null
+                                onCheckedChange = null,
+                                enabled = isEnabled
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 text = displayText(option),
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
                             )
                         }
                     }
@@ -926,9 +987,12 @@ internal class SettingsSectionScopeImpl(
         valueLabel: (Float) -> String,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
+            val alpha = if (isEnabled) 1f else 0.38f
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -957,7 +1021,11 @@ internal class SettingsSectionScopeImpl(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (icon != null) {
-                            Box(modifier = Modifier.padding(end = 16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 16.dp)
+                                    .then(if (!isEnabled) Modifier.alpha(alpha) else Modifier)
+                            ) {
                                 icon()
                             }
                         }
@@ -965,20 +1033,20 @@ internal class SettingsSectionScopeImpl(
                             Text(
                                 text = title,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
                             )
                             if (subtitle != null) {
                                 Text(
                                     text = subtitle,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
                                 )
                             }
                         }
                         Text(
                             text = "${valueLabel(value.start)} - ${valueLabel(value.endInclusive)}",
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = alpha),
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
@@ -989,6 +1057,7 @@ internal class SettingsSectionScopeImpl(
                         onValueChangeFinished = onValueChangeFinished,
                         valueRange = valueRange,
                         steps = steps,
+                        enabled = isEnabled,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp)
@@ -1008,9 +1077,11 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             var showDialog by remember { mutableStateOf(false) }
             val timePickerState = rememberTimePickerState(
                 initialHour = hour,
@@ -1024,6 +1095,7 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = { showDialog = true },
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -1065,9 +1137,11 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             var showDialog by remember { mutableStateOf(false) }
             val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDateMillis)
             val formatter = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
@@ -1078,6 +1152,7 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = { showDialog = true },
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -1120,9 +1195,11 @@ internal class SettingsSectionScopeImpl(
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
         trailingContent: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             var showSheet by remember { mutableStateOf(false) }
             val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -1142,6 +1219,7 @@ internal class SettingsSectionScopeImpl(
                 shape = shape,
                 leadingContent = icon,
                 onClick = { showSheet = true },
+                enabled = isEnabled,
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -1152,7 +1230,7 @@ internal class SettingsSectionScopeImpl(
                             modifier = Modifier.size(28.dp),
                             shape = CircleShape,
                             color = selectedColor,
-                            border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
+                            border = BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
                         ) {}
                     }
                 },
@@ -1423,8 +1501,70 @@ internal class SettingsSectionScopeImpl(
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override fun searchBar(query: String, onQueryChange: (String) -> Unit, placeholder: String, sharedTransitionKey: Any?) {
+    override fun searchBar(query: String, onQueryChange: (String) -> Unit, placeholder: String, enabled: Boolean, sharedTransitionKey: Any?) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
+            val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
+                with(sharedTransitionScope) {
+                    Modifier.sharedBounds(
+                        rememberSharedContentState(key = sharedTransitionKey),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            } else {
+                Modifier
+            }
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(sharedModifier)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = shape,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh
+            ) {
+                var expanded by remember { mutableStateOf(false) }
+
+                SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    onSearch = { expanded = false },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    enabled = isEnabled,
+                    placeholder = { Text(placeholder) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+
+    override fun items(
+        count: Int,
+        key: ((index: Int) -> Any)?,
+        contentType: (index: Int) -> Any?,
+        itemContent: SettingsSectionScope.(Int) -> Unit
+    ) {
+        for (i in 0 until count) {
+            itemContent(i)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun fullScreenSearch(
+        query: String,
+        onQueryChange: (String) -> Unit,
+        onSearch: (String) -> Unit,
+        expanded: Boolean,
+        onExpandedChange: (Boolean) -> Unit,
+        placeholder: String,
+        enabled: Boolean,
+        sharedTransitionKey: Any?,
+        content: @Composable ColumnScope.() -> Unit
+    ) {
+        items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -1441,21 +1581,27 @@ internal class SettingsSectionScopeImpl(
                     .fillMaxWidth()
                     .then(sharedModifier)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clip(shape)
             ) {
                 SearchBar(
-                    query = query,
-                    onQueryChange = onQueryChange,
-                    onSearch = {},
-                    active = false,
-                    onActiveChange = {},
-                    placeholder = { Text(placeholder) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = query,
+                            onQueryChange = onQueryChange,
+                            onSearch = onSearch,
+                            expanded = expanded,
+                            onExpandedChange = onExpandedChange,
+                            enabled = isEnabled,
+                            placeholder = { Text(placeholder) },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    },
+                    expanded = expanded,
+                    onExpandedChange = onExpandedChange,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = SearchBarDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                    )
-                ) {}
+                    shape = shape,
+                    content = content
+                )
             }
         }
     }
@@ -1473,9 +1619,12 @@ internal class SettingsSectionScopeImpl(
         enablePreciseControls: Boolean,
         subtitle: String?,
         icon: (@Composable () -> Unit)?,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
+            val alpha = if (isEnabled) 1f else 0.38f
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -1504,7 +1653,11 @@ internal class SettingsSectionScopeImpl(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (icon != null) {
-                            Box(modifier = Modifier.padding(end = 16.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 16.dp)
+                                    .then(if (!isEnabled) Modifier.alpha(alpha) else Modifier)
+                            ) {
                                 icon()
                             }
                         }
@@ -1512,13 +1665,13 @@ internal class SettingsSectionScopeImpl(
                             Text(
                                 text = title,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
                             )
                             if (subtitle != null) {
                                 Text(
                                     text = subtitle,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
                                 )
                             }
                         }
@@ -1526,7 +1679,7 @@ internal class SettingsSectionScopeImpl(
                             Text(
                                 text = valueLabel(value),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = alpha),
                                 modifier = Modifier.padding(start = 16.dp)
                             )
                         }
@@ -1544,7 +1697,7 @@ internal class SettingsSectionScopeImpl(
                                     onValueChange((value - step).coerceIn(valueRange))
                                     onValueChangeFinished?.invoke()
                                 },
-                                enabled = value > valueRange.start,
+                                enabled = isEnabled && value > valueRange.start,
                                 modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
@@ -1561,6 +1714,7 @@ internal class SettingsSectionScopeImpl(
                             onValueChangeFinished = onValueChangeFinished,
                             valueRange = valueRange,
                             steps = steps,
+                            enabled = isEnabled,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(top = if (enablePreciseControls) 0.dp else 8.dp)
@@ -1573,7 +1727,7 @@ internal class SettingsSectionScopeImpl(
                                     onValueChange((value + step).coerceIn(valueRange))
                                     onValueChangeFinished?.invoke()
                                 },
-                                enabled = value < valueRange.endInclusive,
+                                enabled = isEnabled && value < valueRange.endInclusive,
                                 modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
@@ -1595,12 +1749,12 @@ internal class SettingsSectionScopeImpl(
                             Text(
                                 text = valueLabel(valueRange.start),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
                             )
                             Text(
                                 text = valueLabel(valueRange.endInclusive),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
                             )
                         }
                     }
@@ -1615,9 +1769,11 @@ internal class SettingsSectionScopeImpl(
         keywords: List<String>,
         onAdd: (String) -> Unit,
         onRemove: (String) -> Unit,
+        enabled: Boolean,
         sharedTransitionKey: Any?
     ) {
         items.add { shape ->
+            val isEnabled = sectionEnabled && enabled
             val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                 with(sharedTransitionScope) {
                     Modifier.sharedBounds(
@@ -1642,6 +1798,7 @@ internal class SettingsSectionScopeImpl(
                     keywords = keywords,
                     onAdd = onAdd,
                     onRemove = onRemove,
+                    enabled = isEnabled,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }

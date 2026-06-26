@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ public fun SettingsItemBase(
     shape: Shape,
     subtitle: String? = null,
     onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -59,13 +61,15 @@ public fun SettingsItemBase(
         Modifier
     }
 
+    val alpha = if (enabled) 1f else 0.38f
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .then(sharedModifier)
             .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
             .padding(
                 horizontal = 24.dp,
                 vertical = 20.dp
@@ -74,7 +78,11 @@ public fun SettingsItemBase(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (leadingContent != null) {
-            Box(modifier = Modifier.padding(end = 8.dp)) {
+            Box(
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .then(if (!enabled) Modifier.alpha(alpha) else Modifier)
+            ) {
                 leadingContent()
             }
         }
@@ -83,20 +91,24 @@ public fun SettingsItemBase(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
             )
             if (subtitle != null) {
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
         }
 
         if (trailingContent != null) {
-            Box(modifier = Modifier.padding(start = 8.dp)) {
+            Box(
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .then(if (!enabled) Modifier.alpha(alpha) else Modifier)
+            ) {
                 trailingContent()
             }
         }

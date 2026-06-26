@@ -44,15 +44,17 @@ internal fun KeywordEditor(
     keywords: List<String>,
     onAdd: (String) -> Unit,
     onRemove: (String) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     var newKeyword by remember { mutableStateOf("") }
+    val alpha = if (enabled) 1f else 0.38f
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -63,6 +65,7 @@ internal fun KeywordEditor(
             OutlinedTextField(
                 value = newKeyword,
                 onValueChange = { newKeyword = it },
+                enabled = enabled,
                 modifier = Modifier
                     .weight(1f)
                     .height(56.dp),
@@ -91,12 +94,13 @@ internal fun KeywordEditor(
                         newKeyword = ""
                     }
                 },
+                enabled = enabled,
                 modifier = Modifier.padding(start = 8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
                     contentDescription = "Add Keyword",
-                    tint = if (newKeyword.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = if (newKeyword.isNotBlank() && enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
                 )
             }
         }
@@ -113,6 +117,7 @@ internal fun KeywordEditor(
                     InputChip(
                         selected = true,
                         onClick = { onRemove(keyword) },
+                        enabled = enabled,
                         label = {
                             Text(
                                 text = keyword,
@@ -130,7 +135,7 @@ internal fun KeywordEditor(
                         border = InputChipDefaults.inputChipBorder(
                             selectedBorderColor = Color.Transparent,
                             selectedBorderWidth = 0.dp,
-                            enabled = true,
+                            enabled = enabled,
                             selected = true
                         ),
                         shape = RoundedCornerShape(8.dp)

@@ -15,11 +15,13 @@
 
 package fr.paeelluu.compose_settings_ui
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 
 /**
- * Receiver scope for [SettingsSection] content DSL.
+ * Receiver scope for [settingsSection] content DSL.
  */
 public interface SettingsSectionScope {
     /**
@@ -37,6 +39,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null,
         onClick: () -> Unit
     )
@@ -52,6 +55,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -66,6 +70,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -82,6 +87,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         isError: Boolean = false,
         supportingText: String? = null,
         sharedTransitionKey: Any? = null
@@ -96,6 +102,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null,
         onClick: () -> Unit
     )
@@ -109,6 +116,7 @@ public interface SettingsSectionScope {
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String = { it.toString() },
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -124,6 +132,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -146,6 +155,7 @@ public interface SettingsSectionScope {
         email: String,
         avatar: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null,
         onClick: (() -> Unit)? = null
     )
@@ -158,6 +168,7 @@ public interface SettingsSectionScope {
         title: String,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null,
         content: SettingsSectionScope.() -> Unit
     )
@@ -175,6 +186,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -191,6 +203,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -203,6 +216,7 @@ public interface SettingsSectionScope {
         selectedOption: T,
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String = { it.toString() },
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -215,6 +229,7 @@ public interface SettingsSectionScope {
         selectedOptions: Set<T>,
         onSelectionChange: (Set<T>) -> Unit,
         displayText: (T) -> String = { it.toString() },
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -232,6 +247,7 @@ public interface SettingsSectionScope {
         valueLabel: (Float) -> String = { it.toString() },
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -248,6 +264,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -262,6 +279,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -277,6 +295,7 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -309,14 +328,42 @@ public interface SettingsSectionScope {
     )
 
     /**
-     * Adds an integrated search bar.
+     * Adds an integrated inline search bar.
      * @category Structure & Layout
      */
     public fun searchBar(
         query: String,
         onQueryChange: (String) -> Unit,
         placeholder: String = "Search settings...",
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
+    )
+
+    /**
+     * Adds a list of items to the section.
+     * @category Structure & Layout
+     */
+    public fun items(
+        count: Int,
+        key: ((index: Int) -> Any)? = null,
+        contentType: (index: Int) -> Any? = { null },
+        itemContent: SettingsSectionScope.(Int) -> Unit
+    )
+
+    /**
+     * Adds a search bar that expands to a full screen search view.
+     * @category Structure & Layout
+     */
+    public fun fullScreenSearch(
+        query: String,
+        onQueryChange: (String) -> Unit,
+        onSearch: (String) -> Unit,
+        expanded: Boolean,
+        onExpandedChange: (Boolean) -> Unit,
+        placeholder: String = "Search...",
+        enabled: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        content: @Composable ColumnScope.() -> Unit
     )
 
     /**
@@ -336,6 +383,7 @@ public interface SettingsSectionScope {
         enablePreciseControls: Boolean = false,
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 
@@ -349,6 +397,7 @@ public interface SettingsSectionScope {
         keywords: List<String>,
         onAdd: (String) -> Unit,
         onRemove: (String) -> Unit,
+        enabled: Boolean = true,
         sharedTransitionKey: Any? = null
     )
 }
