@@ -50,20 +50,22 @@ jobs:
           fi
 
       - name: Update Versions in Project Files
-        if: env.SHOULD_BUMP == 'true'
         run: |
-          sed -i -E "s/(libraryVersion = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" gradle/libs.versions.toml
+          if [ "${{ env.SHOULD_BUMP }}" == "true" ]; then
+            sed -i -E "s/(libraryVersion = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" gradle/libs.versions.toml
+          fi
           sed -i -E "s/(composeSettings = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
-          sed -i -E "s/(compose_unified_material_expressive_settings:)[0-9]+\.[0-9]+\.[0-9]+/\1${{ env.TARGET_VERSION }}/" README.md
+          sed -i -E "s/(io\.github\.julespvx:compose-settings-ui:)[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
 
       - name: Commit and Push Changes
-        if: env.SHOULD_BUMP == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add gradle/libs.versions.toml README.md
-          git commit -m "chore: bump version to ${{ env.TARGET_VERSION }}"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update version to ${{ env.TARGET_VERSION }}"
+            git push
+          fi
 
       - name: Publish to Maven Central
         run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-daemon --parallel --configuration-cache
