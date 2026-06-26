@@ -23,12 +23,17 @@ jobs:
           WIKI_COMPONENTS_FILE: wiki/Components.md
         run: |
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+          
+          rm -rf wiki/images/*
+          
           python3 "$GITHUB_WORKSPACE/update_wiki_components.py"
           
           cd wiki
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Home.md Components.md images/
+          
+          git add -A . 
+          
           if git commit -m "docs: auto-update components for version ${{ env.TARGET_VERSION }}"; then
             git push
           else
