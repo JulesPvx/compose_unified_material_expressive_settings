@@ -18,8 +18,9 @@ package fr.paeelluu.compose_settings_ui
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,13 +37,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalFoundationApi::class)
 @Composable
 public fun SettingsItemBase(
     title: String,
     shape: Shape,
+    modifier: Modifier = Modifier,
     subtitle: String? = null,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     enabled: Boolean = true,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
@@ -64,12 +67,20 @@ public fun SettingsItemBase(
     val alpha = if (enabled) 1f else 0.38f
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .then(sharedModifier)
             .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
+            .then(
+                if (onClick != null || onLongClick != null) {
+                    Modifier.combinedClickable(
+                        enabled = enabled,
+                        onClick = onClick ?: {},
+                        onLongClick = onLongClick
+                    )
+                } else Modifier
+            )
             .padding(
                 horizontal = 24.dp,
                 vertical = 20.dp

@@ -17,6 +17,7 @@ package fr.paeelluu.compose_settings_ui
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 
@@ -28,7 +29,11 @@ public interface SettingsSectionScope {
      * Adds a generic custom item to the section.
      * @category Structure & Layout
      */
-    public fun item(content: @Composable (Shape) -> Unit)
+    public fun item(
+        modifier: Modifier = Modifier,
+        visible: Boolean = true,
+        content: @Composable (Shape) -> Unit
+    )
 
     /**
      * Adds a clickable action item.
@@ -40,7 +45,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
+        visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null,
         onClick: () -> Unit
     )
 
@@ -56,7 +64,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -71,7 +82,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -88,9 +102,11 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
+        visible: Boolean = true,
         isError: Boolean = false,
         supportingText: String? = null,
-        sharedTransitionKey: Any? = null
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -103,7 +119,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
+        visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null,
         onClick: () -> Unit
     )
 
@@ -117,7 +136,9 @@ public interface SettingsSectionScope {
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String = { it.toString() },
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -133,7 +154,9 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -143,7 +166,10 @@ public interface SettingsSectionScope {
     public fun info(
         text: String,
         icon: (@Composable () -> Unit)? = null,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -156,7 +182,10 @@ public interface SettingsSectionScope {
         avatar: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
+        visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null,
         onClick: (() -> Unit)? = null
     )
 
@@ -169,7 +198,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
+        visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null,
         content: SettingsSectionScope.() -> Unit
     )
 
@@ -187,7 +219,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -204,7 +239,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -217,7 +255,9 @@ public interface SettingsSectionScope {
         onOptionSelected: (T) -> Unit,
         displayText: (T) -> String = { it.toString() },
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -230,7 +270,9 @@ public interface SettingsSectionScope {
         onSelectionChange: (Set<T>) -> Unit,
         displayText: (T) -> String = { it.toString() },
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -248,7 +290,9 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -265,7 +309,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -280,7 +327,10 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -289,14 +339,17 @@ public interface SettingsSectionScope {
      */
     public fun colorPicker(
         title: String,
-        selectedColor: androidx.compose.ui.graphics.Color,
-        onColorSelected: (androidx.compose.ui.graphics.Color) -> Unit,
-        colors: List<androidx.compose.ui.graphics.Color> = emptyList(),
+        selectedColor: Color,
+        onColorSelected: (Color) -> Unit,
+        colors: List<Color> = emptyList(),
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
+        onLongClick: (() -> Unit)? = null
     )
 
     /**
@@ -305,7 +358,9 @@ public interface SettingsSectionScope {
      */
     public fun footer(
         text: String,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -315,7 +370,9 @@ public interface SettingsSectionScope {
     public fun loading(
         title: String,
         subtitle: String? = null,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -324,7 +381,9 @@ public interface SettingsSectionScope {
      */
     public fun subHeader(
         text: String,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -336,7 +395,9 @@ public interface SettingsSectionScope {
         onQueryChange: (String) -> Unit,
         placeholder: String = "Search settings...",
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -347,6 +408,7 @@ public interface SettingsSectionScope {
         count: Int,
         key: ((index: Int) -> Any)? = null,
         contentType: (index: Int) -> Any? = { null },
+        visible: Boolean = true,
         itemContent: SettingsSectionScope.(Int) -> Unit
     )
 
@@ -362,7 +424,9 @@ public interface SettingsSectionScope {
         onExpandedChange: (Boolean) -> Unit,
         placeholder: String = "Search...",
         enabled: Boolean = true,
+        visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier,
         content: @Composable ColumnScope.() -> Unit
     )
 
@@ -384,7 +448,9 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         icon: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 
     /**
@@ -398,6 +464,8 @@ public interface SettingsSectionScope {
         onAdd: (String) -> Unit,
         onRemove: (String) -> Unit,
         enabled: Boolean = true,
-        sharedTransitionKey: Any? = null
+        visible: Boolean = true,
+        sharedTransitionKey: Any? = null,
+        modifier: Modifier = Modifier
     )
 }
