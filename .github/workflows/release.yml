@@ -91,14 +91,12 @@ jobs:
         env:
           WIKI_COMPONENTS_FILE: wiki/Components.md
         run: |
-          # Checkout wiki repo
+          SCRIPT_PATH="$GITHUB_WORKSPACE/update_wiki_components.py"
+          
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
           
-          # Run the update script
-          cd ..
-          python3 update_wiki_components.py
+          python3 "$SCRIPT_PATH"
           
-          # Commit and push changes
           cd wiki
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
