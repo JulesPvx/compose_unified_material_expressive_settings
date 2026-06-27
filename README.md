@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 **Using Version Catalogs (Recommended):**
 ```toml
 [versions]
-composeSettings = "1.1.7"
+composeSettings = "1.1.8"
 
 [libraries]
 compose-settings = { module = "io.github.julespvx:compose-settings-ui", version.ref = "composeSettings" }
@@ -34,7 +34,7 @@ compose-settings = { module = "io.github.julespvx:compose-settings-ui", version.
 **Standard Notation:**
 ```kotlin
 dependencies {
-    implementation("io.github.julespvx:compose-settings-ui:1.1.7")
+    implementation("io.github.julespvx:compose-settings-ui:1.1.8")
 }
 ```
 
@@ -64,7 +64,7 @@ LazyColumn(modifier = Modifier.fillMaxSize()) {
 
 ## Documentation
 
-For a comprehensive guide, component catalog, and advanced usage examples, please visit the **[Project Wiki](https://github.com/paeelluu/compose_unified_material_expressive_settings/wiki)**.
+For a comprehensive guide, component catalog, and advanced usage examples, please visit the **[Project Wiki](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki)**.
 
 - **[Component Catalog](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki/Components)**: Code examples for all 20+ components.
 - **[Theming](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki/Theming)**: Material 3 token mapping and shape logic.
