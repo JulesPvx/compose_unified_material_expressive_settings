@@ -87,15 +87,28 @@ jobs:
             --title "Release ${{ env.TARGET_VERSION }}" \
             --generate-notes
 
-      - name: Trigger Wiki Update
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'update-wiki.yml',
-              ref: 'main',
-              inputs: { version: '${{ env.TARGET_VERSION }}' }
-            })
+      - name: Generate Fresh Screenshots
+        run: ./gradlew :sample:recordPaparazziDebug
+
+      - name: Update Wiki Documentation
+        env:
+          TARGET_VERSION: ${{ inputs.version }}
+          WIKI_COMPONENTS_FILE: wiki/Components.md
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+          
+          rm -rf wiki/images/*
+          
+          python3 "$GITHUB_WORKSPACE/update_wiki_components.py"
+          
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add -A . 
+          
+          if git commit -m "docs: auto-update components for version ${{ env.TARGET_VERSION }}"; then
+            git push
+          else
+            echo "No changes to wiki documentation."
+          fi
