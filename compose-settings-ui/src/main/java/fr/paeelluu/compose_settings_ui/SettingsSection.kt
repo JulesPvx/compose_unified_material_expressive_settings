@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
  * @param content The DSL for defining the items within the section.
  */
 public fun LazyListScope.settingsSection(
+    key: Any? = null,
     title: String? = null,
     enabled: Boolean = true,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -56,8 +57,10 @@ public fun LazyListScope.settingsSection(
 
     val titleAlpha = if (enabled) 1f else 0.38f
 
+    val baseKey = key ?: title
+
     if (title != null) {
-        item(key = "section_title_${title}") {
+        item(key = baseKey?.let { "section_title_$it" }) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelLarge,
@@ -72,7 +75,7 @@ public fun LazyListScope.settingsSection(
 
     itemsIndexed(
         items = scope.items,
-        key = { index, _ -> "section_item_${title}_$index" }
+        key = baseKey?.let { bKey -> { index, _ -> "section_item_${bKey}_$index" } }
     ) { index, itemContent ->
         Box(modifier = Modifier.padding(bottom = 2.dp)) {
             val shape = computeSettingsShape(index = index, total = scope.items.size)
@@ -80,7 +83,7 @@ public fun LazyListScope.settingsSection(
         }
     }
 
-    item(key = "section_spacer_$title") {
+    item(key = baseKey?.let { "section_spacer_$it" }) {
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
