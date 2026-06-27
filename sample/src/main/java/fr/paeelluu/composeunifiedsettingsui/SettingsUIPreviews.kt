@@ -297,6 +297,8 @@ fun FullSettingsScreenPreview() {
     var brightness by remember { mutableFloatStateOf(0.8f) }
     var accentColor by remember { mutableStateOf(Color(0xFF6E7FDC)) }
     var searchQuery by remember { mutableStateOf("") }
+    var fullSearchQuery by remember { mutableStateOf("") }
+    var fullSearchExpanded by remember { mutableStateOf(false) }
 
     val sections = remember {
         listOf("Account", "System", "Customization", "About")
@@ -304,6 +306,11 @@ fun FullSettingsScreenPreview() {
 
     val filteredSections = remember(searchQuery) {
         sections.filter { it.contains(searchQuery, ignoreCase = true) }
+    }
+
+    val fruits = remember { listOf("Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape") }
+    val filteredFruits = remember(fullSearchQuery) {
+        fruits.filter { it.contains(fullSearchQuery, ignoreCase = true) }
     }
 
     MaterialTheme {
@@ -320,6 +327,31 @@ fun FullSettingsScreenPreview() {
                         query = searchQuery,
                         onQueryChange = { searchQuery = it },
                         placeholder = "Search settings..."
+                    )
+
+                    fullScreenSearch(
+                        query = fullSearchQuery,
+                        onQueryChange = { fullSearchQuery = it },
+                        onSearch = { fullSearchExpanded = false },
+                        expanded = fullSearchExpanded,
+                        onExpandedChange = { fullSearchExpanded = it },
+                        placeholder = "Full screen search...",
+                        content = {
+                            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                                items(filteredFruits) { item ->
+                                    Text(
+                                        text = item,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                fullSearchQuery = item
+                                                fullSearchExpanded = false
+                                            }
+                                            .padding(16.dp)
+                                    )
+                                }
+                            }
+                        }
                     )
                 }
 
@@ -571,6 +603,39 @@ private fun SettingsSectionScope.SearchBarSample(query: String, onQueryChange: (
     )
 }
 
+private fun SettingsSectionScope.FullScreenSearchSample(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    items: List<String>
+) {
+    fullScreenSearch(
+        query = query,
+        onQueryChange = onQueryChange,
+        onSearch = { onExpandedChange(false) },
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        placeholder = "Search items...",
+        content = {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(items) { item ->
+                    Text(
+                        text = item,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onQueryChange(item)
+                                onExpandedChange(false)
+                            }
+                            .padding(16.dp)
+                    )
+                }
+            }
+        }
+    )
+}
+
 private fun SettingsSectionScope.FooterSample() {
     footer(text = "Version 1.0.8 (Alpha)\n© 2026 Jules Pouvreaux")
 }
@@ -665,12 +730,23 @@ private fun SpecializedComponentsPreview() {
 @Composable
 private fun AdvancedComponentsPreview() {
     var query by remember { mutableStateOf("") }
+    var searchExpanded by remember { mutableStateOf(false) }
     var radioSelected by remember { mutableStateOf("Option 1") }
     var multiSelected by remember { mutableStateOf(setOf("Email")) }
+
+    val allItems = listOf("Apple", "Banana", "Cherry", "Date")
+    val filteredItems = allItems.filter { it.contains(query, ignoreCase = true) }
 
     MaterialTheme {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
             settingsSection(title = "Advanced & Feedback") {
+                FullScreenSearchSample(
+                    query = query,
+                    onQueryChange = { query = it },
+                    expanded = searchExpanded,
+                    onExpandedChange = { searchExpanded = it },
+                    items = filteredItems
+                )
                 SearchBarSample(query) { query = it }
                 RadioGroupSample(radioSelected) { radioSelected = it }
                 MultiSelectListSample(multiSelected) { multiSelected = it }

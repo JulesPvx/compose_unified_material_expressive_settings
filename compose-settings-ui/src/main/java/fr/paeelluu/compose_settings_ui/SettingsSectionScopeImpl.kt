@@ -37,11 +37,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -49,20 +46,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Remove
@@ -73,6 +67,7 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -85,7 +80,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.SearchBarState
+import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -93,7 +88,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonColors
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -104,14 +98,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
@@ -125,6 +118,7 @@ import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import fr.paeelluu.compose_settings_ui.components.KeywordEditor
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -1662,8 +1656,7 @@ internal class SettingsSectionScopeImpl(
                 Surface(
                     modifier = modifier
                         .fillMaxWidth()
-                        .then(sharedModifier)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .then(sharedModifier),
                     shape = shape,
                     color = MaterialTheme.colorScheme.surfaceContainerHigh
                 ) {
@@ -1716,6 +1709,53 @@ internal class SettingsSectionScopeImpl(
         if (visible) {
             items.add { shape ->
                 val isEnabled = sectionEnabled && enabled
+                val searchBarState = rememberSearchBarState()
+                val textFieldState = rememberTextFieldState(query)
+                val scope = rememberCoroutineScope()
+
+                LaunchedEffect(expanded) {
+                    if (expanded && searchBarState.currentValue == SearchBarValue.Collapsed) {
+                        searchBarState.animateToExpanded()
+                    } else if (!expanded && searchBarState.currentValue == SearchBarValue.Expanded) {
+                        searchBarState.animateToCollapsed()
+                    }
+                }
+
+                LaunchedEffect(searchBarState.currentValue) {
+                    val isActuallyExpanded = searchBarState.currentValue == SearchBarValue.Expanded
+                    if (isActuallyExpanded != expanded) {
+                        onExpandedChange(isActuallyExpanded)
+                    }
+                }
+
+                LaunchedEffect(query) {
+                    if (textFieldState.text.toString() != query) {
+                        textFieldState.setTextAndPlaceCursorAtEnd(query)
+                    }
+                }
+
+                LaunchedEffect(textFieldState.text) {
+                    val newText = textFieldState.text.toString()
+                    if (newText != query) {
+                        onQueryChange(newText)
+                    }
+                }
+
+                val inputField = @Composable {
+                    SearchBarDefaults.InputField(
+                        textFieldState = textFieldState,
+                        searchBarState = searchBarState,
+                        onSearch = {
+                            onSearch(it)
+                            scope.launch { searchBarState.animateToCollapsed() }
+                        },
+                        enabled = isEnabled,
+                        placeholder = { Text(placeholder) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
                 val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedTransitionKey != null) {
                     with(sharedTransitionScope) {
                         Modifier.sharedBounds(
@@ -1731,29 +1771,20 @@ internal class SettingsSectionScopeImpl(
                     modifier = modifier
                         .fillMaxWidth()
                         .then(sharedModifier)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     SearchBar(
-                        inputField = {
-                            SearchBarDefaults.InputField(
-                                query = query,
-                                onQueryChange = onQueryChange,
-                                onSearch = onSearch,
-                                expanded = expanded,
-                                onExpandedChange = onExpandedChange,
-                                enabled = isEnabled,
-                                placeholder = { Text(placeholder) },
-                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        },
-                        expanded = expanded,
-                        onExpandedChange = onExpandedChange,
+                        state = searchBarState,
+                        inputField = inputField,
                         modifier = Modifier.fillMaxWidth(),
-                        shape = shape,
-                        content = content
+                        shape = shape
                     )
                 }
+
+                ExpandedFullScreenSearchBar(
+                    state = searchBarState,
+                    inputField = inputField,
+                    content = content
+                )
             }
         }
     }
