@@ -54,6 +54,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -73,8 +74,11 @@ import fr.paeelluu.compose_settings_ui.SettingsSectionScope
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun SharedTransitionSamplePreview() {
-    var showDetails by remember { mutableStateOf(false) }
+fun SharedTransitionSamplePreview(initialShowDetails: Boolean = false) {
+    var showDetails by remember { mutableStateOf(initialShowDetails) }
+    LaunchedEffect(initialShowDetails) {
+        showDetails = initialShowDetails
+    }
 
     MaterialTheme {
         SharedTransitionLayout {
@@ -101,6 +105,9 @@ fun SharedTransitionSamplePreview() {
                                     name = "Jules Pouvreaux",
                                     email = "Tap to see transition",
                                     sharedTransitionKey = "profile_card",
+                                    avatarSharedTransitionKey = "profile_avatar",
+                                    titleSharedTransitionKey = "profile_name",
+                                    subtitleSharedTransitionKey = "profile_email",
                                     onClick = { showDetails = true }
                                 )
 
@@ -108,6 +115,8 @@ fun SharedTransitionSamplePreview() {
                                     title = "Advanced Settings",
                                     subtitle = "Click me too",
                                     sharedTransitionKey = "action_card",
+                                    titleSharedTransitionKey = "action_title",
+                                    subtitleSharedTransitionKey = "action_subtitle",
                                     onClick = { showDetails = true }
                                 )
                             }
@@ -130,38 +139,99 @@ fun SharedTransitionSamplePreview() {
                             modifier = Modifier
                                 .padding(innerPadding)
                                 .fillMaxSize()
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Box(
+                            Surface(
                                 modifier = Modifier
                                     .sharedBounds(
                                         rememberSharedContentState(key = "profile_card"),
                                         animatedVisibilityScope = this@AnimatedContent
                                     )
-                                    .size(200.dp)
-                                    .clip(RoundedCornerShape(28.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                shape = RoundedCornerShape(28.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainer
                             ) {
-                                Text("Profile Details", style = MaterialTheme.typography.headlineMedium)
+                                Column(
+                                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .sharedBounds(
+                                                rememberSharedContentState(key = "profile_avatar"),
+                                                animatedVisibilityScope = this@AnimatedContent
+                                            )
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text(
+                                                text = "J",
+                                                style = MaterialTheme.typography.headlineLarge,
+                                                modifier = Modifier.sharedBounds(
+                                                    rememberSharedContentState(key = "profile_avatar_text"),
+                                                    animatedVisibilityScope = this@AnimatedContent
+                                                )
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = "Jules Pouvreaux",
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "profile_name"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                    Text(
+                                        text = "jules@example.com",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "profile_email"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                }
                             }
 
-                            Spacer(modifier = Modifier.height(32.dp))
-
-                            Box(
+                            Surface(
                                 modifier = Modifier
                                     .sharedBounds(
                                         rememberSharedContentState(key = "action_card"),
                                         animatedVisibilityScope = this@AnimatedContent
                                     )
                                     .fillMaxWidth()
-                                    .height(100.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                                contentAlignment = Alignment.Center
+                                    .height(100.dp),
+                                shape = RoundedCornerShape(28.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainer
                             ) {
-                                Text("Expanded Action Info")
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = "Advanced Settings",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "action_title"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                    Text(
+                                        text = "Click me too",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "action_subtitle"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
@@ -288,6 +358,7 @@ fun SearchableSettingsPreview() {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 fun FullSettingsScreenPreview() {
@@ -299,6 +370,8 @@ fun FullSettingsScreenPreview() {
     var searchQuery by remember { mutableStateOf("") }
     var fullSearchQuery by remember { mutableStateOf("") }
     var fullSearchExpanded by remember { mutableStateOf(false) }
+
+    var showProfileDetail by remember { mutableStateOf(false) }
 
     val sections = remember {
         listOf("Account", "System", "Customization", "About")
@@ -314,84 +387,335 @@ fun FullSettingsScreenPreview() {
     }
 
     MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(16.dp)
-            ) {
-                settingsSection(title = "Search") {
-                    searchBar(
-                        query = searchQuery,
-                        onQueryChange = { searchQuery = it },
-                        placeholder = "Search settings..."
-                    )
+        SharedTransitionLayout {
+            AnimatedContent(targetState = showProfileDetail, label = "main_transition") { isDetailVisible ->
+                if (!isDetailVisible) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        ) {
+                            settingsSection(
+                                title = "Search",
+                                sharedTransitionScope = this@SharedTransitionLayout,
+                                animatedVisibilityScope = this@AnimatedContent
+                            ) {
+                                searchBar(
+                                    query = searchQuery,
+                                    onQueryChange = { searchQuery = it },
+                                    placeholder = "Search settings..."
+                                )
 
-                    fullScreenSearch(
-                        query = fullSearchQuery,
-                        onQueryChange = { fullSearchQuery = it },
-                        onSearch = { fullSearchExpanded = false },
-                        expanded = fullSearchExpanded,
-                        onExpandedChange = { fullSearchExpanded = it },
-                        placeholder = "Full screen search...",
-                        content = {
-                            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                                items(filteredFruits) { item ->
-                                    Text(
-                                        text = item,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable {
-                                                fullSearchQuery = item
-                                                fullSearchExpanded = false
+                                fullScreenSearch(
+                                    query = fullSearchQuery,
+                                    onQueryChange = { fullSearchQuery = it },
+                                    onSearch = { fullSearchExpanded = false },
+                                    expanded = fullSearchExpanded,
+                                    onExpandedChange = { fullSearchExpanded = it },
+                                    placeholder = "Full screen search...",
+                                    content = {
+                                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                                            items(filteredFruits) { item ->
+                                                Text(
+                                                    text = item,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .clickable {
+                                                            fullSearchQuery = item
+                                                            fullSearchExpanded = false
+                                                        }
+                                                        .padding(16.dp)
+                                                )
                                             }
-                                            .padding(16.dp)
+                                        }
+                                    }
+                                )
+                            }
+
+                            if (filteredSections.contains("Account")) {
+                                settingsSection(
+                                    title = "Account",
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    titleSharedTransitionKey = "account_section_title"
+                                ) {
+                                    userProfile(
+                                        name = "Jules Pouvreaux",
+                                        email = "jules@example.com",
+                                        avatar = {
+                                            Surface(
+                                                shape = CircleShape,
+                                                color = MaterialTheme.colorScheme.primaryContainer,
+                                                modifier = Modifier.size(40.dp)
+                                            ) {
+                                                Box(contentAlignment = Alignment.Center) {
+                                                    with(sharedTransitionScope!!) {
+                                                        Text(
+                                                            text = "J",
+                                                            style = MaterialTheme.typography.titleMedium,
+                                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                            modifier = Modifier.sharedBounds(
+                                                                rememberSharedContentState(key = "profile_avatar_text"),
+                                                                animatedVisibilityScope = animatedVisibilityScope!!
+                                                            )
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        sharedTransitionKey = "profile_card",
+                                        avatarSharedTransitionKey = "profile_avatar",
+                                        titleSharedTransitionKey = "profile_name",
+                                        subtitleSharedTransitionKey = "profile_email",
+                                        onClick = { showProfileDetail = true }
+                                    )
+                                action(
+                                    title = "Security Settings",
+                                    subtitle = "Manage your password and 2FA",
+                                    icon = {
+                                        with(sharedTransitionScope!!) {
+                                            Icon(
+                                                Icons.Default.Settings,
+                                                contentDescription = null,
+                                                modifier = Modifier.sharedElement(
+                                                    rememberSharedContentState("security_icon"),
+                                                    animatedVisibilityScope = animatedVisibilityScope!!
+                                                )
+                                            )
+                                        }
+                                    },
+                                    sharedTransitionKey = "security_card",
+                                    titleSharedTransitionKey = "security_title",
+                                    subtitleSharedTransitionKey = "security_subtitle",
+                                    onClick = { showProfileDetail = true }
+                                )
+                                }
+                            }
+
+                            if (filteredSections.contains("System")) {
+                                settingsSection(
+                                    title = "System",
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@AnimatedContent
+                                ) {
+                                    SwitchSample(bluetoothEnabled) { bluetoothEnabled = it }
+                                    SegmentedButtonSample(selectedPerformance) { selectedPerformance = it }
+                                    SliderSample(volume) { volume = it }
+                                    SliderPreciseSample(brightness) { brightness = it }
+                                }
+                            }
+
+                            if (filteredSections.contains("Customization")) {
+                                settingsSection(
+                                    title = "Customization",
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@AnimatedContent
+                                ) {
+                                    ColorPickerSample(accentColor) { accentColor = it }
+                                    ExpandableGroupSample()
+                                }
+                            }
+
+                            if (searchQuery.isEmpty()) {
+                                settingsSection(
+                                    title = "Disabled Section",
+                                    enabled = false,
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@AnimatedContent
+                                ) {
+                                    switch(title = "Disabled Switch", checked = true, onCheckedChange = {})
+                                    slider(title = "Disabled Slider", value = 0.5f, onValueChange = {})
+                                    action(title = "Disabled Action", onClick = {})
+                                }
+                            }
+
+                            if (filteredSections.contains("About")) {
+                                settingsSection(
+                                    title = "About",
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@AnimatedContent
+                                ) {
+                                    FooterSample()
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                title = {
+                                    Text(
+                                        text = "Account Details",
+                                        modifier = Modifier.sharedElement(
+                                            rememberSharedContentState(key = "account_section_title"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = { showProfileDetail = false }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                                    }
+                                }
+                            )
+                        }
+                    ) { innerPadding ->
+                        Column(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Surface(
+                                modifier = Modifier
+                                    .sharedBounds(
+                                        rememberSharedContentState(key = "profile_card"),
+                                        animatedVisibilityScope = this@AnimatedContent
+                                    )
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                shape = RoundedCornerShape(28.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainer
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .sharedBounds(
+                                                rememberSharedContentState(key = "profile_avatar"),
+                                                animatedVisibilityScope = this@AnimatedContent
+                                            )
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text(
+                                                text = "J",
+                                                style = MaterialTheme.typography.headlineLarge,
+                                                modifier = Modifier.sharedBounds(
+                                                    rememberSharedContentState(key = "profile_avatar_text"),
+                                                    animatedVisibilityScope = this@AnimatedContent
+                                                )
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = "Jules Pouvreaux",
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "profile_name"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                    Text(
+                                        text = "jules@example.com",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "profile_email"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                modifier = Modifier
+                                    .sharedBounds(
+                                        rememberSharedContentState(key = "security_card"),
+                                        animatedVisibilityScope = this@AnimatedContent
+                                    )
+                                    .fillMaxWidth()
+                                    .height(100.dp),
+                                shape = RoundedCornerShape(28.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainer
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = "Security Settings Details",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "security_title"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
+                                    )
+                                    Text(
+                                        text = "Manage your password and 2FA",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.sharedBounds(
+                                            rememberSharedContentState(key = "security_subtitle"),
+                                            animatedVisibilityScope = this@AnimatedContent
+                                        )
                                     )
                                 }
                             }
                         }
-                    )
-                }
-
-                if (filteredSections.contains("Account")) {
-                    settingsSection(title = "Account") {
-                        UserProfileSample()
-                        ActionSample()
                     }
                 }
+            }
+        }
+    }
+}
 
-                if (filteredSections.contains("System")) {
-                    settingsSection(title = "System") {
-                        SwitchSample(bluetoothEnabled) { bluetoothEnabled = it }
-                        SegmentedButtonSample(selectedPerformance) { selectedPerformance = it }
-                        SliderSample(volume) { volume = it }
-                        SliderPreciseSample(brightness) { brightness = it }
+@Preview(showBackground = true, name = "Adaptive Corner Rounding Demo")
+@Composable
+fun AdaptiveCornerRoundingPreview() {
+    MaterialTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Adaptive Corner Rounding",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    settingsSection(title = "Expanding Group") {
+                        expandableGroup(
+                            title = "Tap to see fluid corners",
+                            icon = { Icon(Icons.Default.Notifications, contentDescription = null) },
+                            initiallyExpanded = false
+                        ) {
+                            action(title = "Item 1", onClick = {})
+                            action(title = "Item 2", onClick = {})
+                        }
                     }
-                }
 
-                if (filteredSections.contains("Customization")) {
-                    settingsSection(title = "Customization") {
-                        ColorPickerSample(accentColor) { accentColor = it }
-                        ExpandableGroupSample()
+                    settingsSection(title = "Inline Selector") {
+                        selector(
+                            title = "Theme Selection",
+                            options = listOf("Light", "Dark", "System"),
+                            selectedOption = "System",
+                            onOptionSelected = {}
+                        )
                     }
-                }
 
-                if (searchQuery.isEmpty()) {
-                    settingsSection(
-                        title = "Disabled Section",
-                        enabled = false
-                    ) {
-                        switch(title = "Disabled Switch", checked = true, onCheckedChange = {})
-                        slider(title = "Disabled Slider", value = 0.5f, onValueChange = {})
-                        action(title = "Disabled Action", onClick = {})
-                    }
-                }
-
-                if (filteredSections.contains("About")) {
-                    settingsSection(title = "About") {
-                        FooterSample()
+                    item {
+                        Text(
+                            text = "Notice how the container corners smoothly transition from large (outer) to small (inner) to create a cohesive grouped appearance.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
                 }
             }

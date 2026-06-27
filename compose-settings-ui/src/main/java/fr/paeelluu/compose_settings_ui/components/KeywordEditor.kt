@@ -18,6 +18,9 @@
 
 package fr.paeelluu.compose_settings_ui.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -54,7 +57,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 internal fun KeywordEditor(
     title: String,
@@ -63,17 +66,29 @@ internal fun KeywordEditor(
     onAdd: (String) -> Unit,
     onRemove: (String) -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    titleSharedTransitionKey: Any? = null
 ) {
     var newKeyword by remember { mutableStateOf("") }
     val alpha = if (enabled) 1f else 0.38f
 
     Column(modifier = modifier.fillMaxWidth()) {
+        val titleModifier = if (titleSharedTransitionKey != null && sharedTransitionScope != null && animatedVisibilityScope != null) {
+            with(sharedTransitionScope) {
+                Modifier.sharedElement(
+                    rememberSharedContentState(key = titleSharedTransitionKey),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
+        } else Modifier
+
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = titleModifier.padding(bottom = 8.dp)
         )
 
         Row(

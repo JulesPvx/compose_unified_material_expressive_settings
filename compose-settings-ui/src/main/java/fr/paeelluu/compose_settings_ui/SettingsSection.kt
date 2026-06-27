@@ -46,6 +46,7 @@ public fun LazyListScope.settingsSection(
     enabled: Boolean = true,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    titleSharedTransitionKey: Any? = null,
     content: SettingsSectionScope.() -> Unit
 ) {
     val scope = SettingsSectionScopeImpl(
@@ -69,6 +70,16 @@ public fun LazyListScope.settingsSection(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .padding(top = 16.dp, bottom = 8.dp)
+                    .then(
+                        if (titleSharedTransitionKey != null && sharedTransitionScope != null && animatedVisibilityScope != null) {
+                            with(sharedTransitionScope) {
+                                Modifier.sharedElement(
+                                    rememberSharedContentState(key = titleSharedTransitionKey),
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                            }
+                        } else Modifier
+                    )
             )
         }
     }

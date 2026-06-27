@@ -1,11 +1,11 @@
 /*
  * '||''''|                                                  ||                       .|'''.|            .     .    ||
- *  ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
- *  ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
- *  ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
+ * ||  .    ... ... ... ...  ... ..    ....   ....   ....  ...  .... ...   ....      ||..  '    ....  .||.  .||.  ...  .. ...     ... .  ....
+ * ||''|     '|..'   ||'  ||  ||' '' .|...|| ||. '  ||. '   ||   '|.  |  .|...||      ''|||.  .|...||  ||    ||    ||   ||  ||   || ||  ||. '
+ * ||         .|.    ||    |  ||     ||      . '|.. . '|..  ||    '|.|   ||         .     '|| ||       ||    ||    ||   ||  ||    |''   . '|..
  * .||.....| .|  ||.  ||...'  .||.     '|...' |'..|' |'..|' .||.    '|     '|...'    |'....|'   '|...'  '|.'  '|.' .||. .||. ||.  '||||. |'..|'
- *                    ||                                                                                                         .|....'
- *                   ''''
+ * ||                                                                                                         .|....'
+ * ''''
  *
  * Copyright (c) 2026 Jules Pouvreaux
  *
@@ -18,6 +18,9 @@
 
 package fr.paeelluu.compose_settings_ui
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,6 +32,17 @@ import androidx.compose.ui.graphics.Shape
  * This interface defines the DSL for adding various setting items to a section.
  */
 public interface SettingsSectionScope {
+    /**
+     * The [SharedTransitionScope] provided to the section, if any.
+     */
+    @OptIn(ExperimentalSharedTransitionApi::class)
+    public val sharedTransitionScope: SharedTransitionScope?
+
+    /**
+     * The [AnimatedVisibilityScope] provided to the section, if any.
+     */
+    public val animatedVisibilityScope: AnimatedVisibilityScope?
+
     /**
      * Adds a generic custom item to the section.
      *
@@ -60,6 +74,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the action can be clicked.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key used for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional callback for long press events.
      * @param onClick Callback triggered when the item is clicked.
@@ -73,6 +89,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null,
         onClick: () -> Unit
@@ -92,6 +110,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the switch is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Toggles
@@ -106,6 +126,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -124,6 +146,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the checkbox is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Toggles
@@ -138,6 +162,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -160,6 +186,8 @@ public interface SettingsSectionScope {
      * @param isError Whether to display the text field in an error state.
      * @param supportingText Optional text displayed below the field (e.g., error message).
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @category Input
      */
@@ -177,6 +205,8 @@ public interface SettingsSectionScope {
         isError: Boolean = false,
         supportingText: String? = null,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 
@@ -192,6 +222,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the link is clickable.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @param onClick Callback triggered when the link is clicked.
@@ -205,6 +237,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null,
         onClick: () -> Unit
@@ -251,6 +285,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the stepper is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @category Input
      */
@@ -265,6 +301,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 
@@ -277,6 +315,7 @@ public interface SettingsSectionScope {
      * @param icon Optional leading icon.
      * @param visible Whether the information block is visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param textSharedTransitionKey Key used for the text's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Structure & Layout
@@ -286,6 +325,7 @@ public interface SettingsSectionScope {
         icon: (@Composable () -> Unit)? = null,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        textSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -302,6 +342,9 @@ public interface SettingsSectionScope {
      * @param enabled Whether the profile item is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param avatarSharedTransitionKey Key used for the avatar's shared element transition.
+     * @param titleSharedTransitionKey Key used for the name's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the email's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @param onClick Optional click callback.
@@ -315,6 +358,9 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        avatarSharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null,
         onClick: (() -> Unit)? = null
@@ -330,7 +376,9 @@ public interface SettingsSectionScope {
      * @param trailingContent Optional trailing content for the group header.
      * @param enabled Whether the group header is interactive.
      * @param visible Whether the group is visible.
+     * @param initiallyExpanded Whether the group is initially expanded.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
      * @param modifier The [Modifier] to be applied to the group header.
      * @param onLongClick Optional long click callback on the group header.
      * @param content DSL for defining the items within the group.
@@ -342,7 +390,9 @@ public interface SettingsSectionScope {
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
         visible: Boolean = true,
+        initiallyExpanded: Boolean = false,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null,
         content: SettingsSectionScope.() -> Unit
@@ -363,7 +413,10 @@ public interface SettingsSectionScope {
      * @param trailingContent Optional trailing content.
      * @param enabled Whether the selector is interactive.
      * @param visible Whether the item should be visible.
+     * @param initiallyExpanded Whether the selector is initially expanded.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Selection
@@ -379,7 +432,10 @@ public interface SettingsSectionScope {
         trailingContent: (@Composable () -> Unit)? = null,
         enabled: Boolean = true,
         visible: Boolean = true,
+        initiallyExpanded: Boolean = false,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -400,6 +456,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the selector is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Selection
@@ -416,6 +474,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -489,6 +549,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the slider is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @category Sliders
      */
@@ -505,6 +567,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 
@@ -524,6 +588,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the item is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Pickers
@@ -540,6 +606,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -558,6 +626,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the item is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Pickers
@@ -572,6 +642,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -591,6 +663,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the item is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @param onLongClick Optional long click callback.
      * @category Pickers
@@ -606,6 +680,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier,
         onLongClick: (() -> Unit)? = null
     )
@@ -618,6 +694,7 @@ public interface SettingsSectionScope {
      * @param text The footer text content.
      * @param visible Whether the footer is visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param textSharedTransitionKey Key used for the text's shared element transition.
      * @param modifier The [Modifier] to be applied to the footer.
      * @category Structure & Layout
      */
@@ -625,6 +702,7 @@ public interface SettingsSectionScope {
         text: String,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        textSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 
@@ -637,6 +715,8 @@ public interface SettingsSectionScope {
      * @param subtitle Optional secondary text.
      * @param visible Whether the loading item is visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @category Structure & Layout
      */
@@ -645,6 +725,8 @@ public interface SettingsSectionScope {
         subtitle: String? = null,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 
@@ -656,6 +738,7 @@ public interface SettingsSectionScope {
      * @param text The label text.
      * @param visible Whether the sub-header is visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param textSharedTransitionKey Key used for the text's shared element transition.
      * @param modifier The [Modifier] to be applied to the sub-header.
      * @category Structure & Layout
      */
@@ -663,6 +746,7 @@ public interface SettingsSectionScope {
         text: String,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        textSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 
@@ -760,6 +844,8 @@ public interface SettingsSectionScope {
      * @param enabled Whether the slider is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
+     * @param subtitleSharedTransitionKey Key used for the subtitle's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @category Sliders
      */
@@ -779,6 +865,8 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
+        subtitleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 
@@ -795,6 +883,7 @@ public interface SettingsSectionScope {
      * @param enabled Whether the keyword editor is interactive.
      * @param visible Whether the item should be visible.
      * @param sharedTransitionKey Key for shared element transitions.
+     * @param titleSharedTransitionKey Key used for the title's shared element transition.
      * @param modifier The [Modifier] to be applied to the item.
      * @category Input
      */
@@ -807,6 +896,7 @@ public interface SettingsSectionScope {
         enabled: Boolean = true,
         visible: Boolean = true,
         sharedTransitionKey: Any? = null,
+        titleSharedTransitionKey: Any? = null,
         modifier: Modifier = Modifier
     )
 }

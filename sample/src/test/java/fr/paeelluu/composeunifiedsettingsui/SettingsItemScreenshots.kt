@@ -21,6 +21,13 @@ package fr.paeelluu.composeunifiedsettingsui
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Notifications
@@ -359,5 +366,66 @@ class SettingsItemScreenshots {
                 }
             }
         }
+    }
+
+    @Test
+    fun adaptiveShapesVisual() {
+        val composeView = ComposeView(paparazzi.context).apply {
+            setContent {
+                var expanded by remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    delay(500)
+                    expanded = true
+                }
+
+                MaterialTheme {
+                    Surface(color = Color.White) {
+                        LazyColumn(modifier = Modifier.padding(16.dp)) {
+                            settingsSection(title = "Adaptive Shapes Animation") {
+                                expandableGroup(
+                                    title = "Expanding Container",
+                                    icon = { Icon(Icons.Default.Notifications, contentDescription = null) },
+                                    initiallyExpanded = expanded
+                                ) {
+                                    action(title = "Grouped Item 1", onClick = {})
+                                    action(title = "Grouped Item 2", onClick = {})
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        paparazzi.gif(
+            view = composeView,
+            name = "adaptive_shapes",
+            start = 0L,
+            end = 2000L,
+            fps = 30
+        )
+    }
+
+    @Test
+    fun sharedTransitionVisual() {
+        val composeView = ComposeView(paparazzi.context).apply {
+            setContent {
+                var showDetails by remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    delay(500)
+                    showDetails = true
+                }
+
+                SharedTransitionSamplePreview(initialShowDetails = showDetails)
+            }
+        }
+
+        paparazzi.gif(
+            view = composeView,
+            name = "shared_transitions",
+            start = 0L,
+            end = 2000L,
+            fps = 30
+        )
     }
 }

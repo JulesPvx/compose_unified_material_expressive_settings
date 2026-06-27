@@ -70,6 +70,18 @@ For a comprehensive guide, component catalog, and advanced usage examples, pleas
 - **[Theming](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki/Theming)**: Material 3 token mapping and shape logic.
 - **[Advanced Usage](https://github.com/JulesPvx/compose_unified_material_expressive_settings/wiki/Advanced-Usage)**: Shared transitions and custom items.
 
+## Visuals
+
+### Adaptive Corner Rounding
+![Adaptive Corner Rounding](https://github.com/JulesPvx/compose_unified_material_expressive_settings/raw/main/docs/assets/adaptive_shapes.gif)
+
+*A 10-15 second recording showing how corners dynamically adjust when items are expanded or grouped, maintaining the expressive container aesthetic.*
+
+### Shared Element Transitions
+![Shared Element Transitions](https://github.com/JulesPvx/compose_unified_material_expressive_settings/raw/main/docs/assets/shared_transitions.gif)
+
+*Demonstration of fluid transitions between settings items and detail screens using the built-in Shared Element Transition support.*
+
 ## License
 
 Licensed under the Apache License, Version 2.0.
