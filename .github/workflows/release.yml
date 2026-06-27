@@ -51,29 +51,34 @@ jobs:
 
       - name: Update Versions in Project Files
         run: |
+          echo "Target Version: ${{ env.TARGET_VERSION }}"
           if [ "${{ env.SHOULD_BUMP }}" == "true" ]; then
-            sed -i -E "s/(libraryVersion = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" gradle/libs.versions.toml
+            sed -i -E "s/(libraryVersion\s*=\s*\")[^\"]*/\1${{ env.TARGET_VERSION }}/" gradle/libs.versions.toml
           fi
-          sed -i -E "s/(composeSettings = \")[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
+          sed -i -E "s/(composeSettings\s*=\s*\")[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
           sed -i -E "s/(io\.github\.julespvx:compose-settings-ui:)[^\"]*/\1${{ env.TARGET_VERSION }}/" README.md
 
       - name: Record Paparazzi Screenshots
-        run: ./gradlew :sample:recordPaparazzi --no-daemon
+        run: ./gradlew :sample:recordPaparazzi --no-daemon --rerun-tasks
 
       - name: Prepare Assets for Documentation
         run: |
           mkdir -p docs/assets
           cp sample/src/test/snapshots/videos/fr.paeelluu.composeunifiedsettingsui_SettingsItemScreenshots_adaptiveShapesVisual_adaptive_shapes.png docs/assets/adaptive_shapes.gif
           cp sample/src/test/snapshots/videos/fr.paeelluu.composeunifiedsettingsui_SettingsItemScreenshots_sharedTransitionVisual_shared_transitions.png docs/assets/shared_transitions.gif
+          ls -R docs/assets
 
       - name: Commit and Push Changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add gradle/libs.versions.toml README.md sample/src/test/snapshots docs/assets
+          git add .
+          git status
           if ! git diff --cached --quiet; then
             git commit -m "chore: update version to ${{ env.TARGET_VERSION }} and refresh screenshots"
             git push
+          else
+            echo "No changes to commit in the main repository."
           fi
 
       - name: Publish to Maven Central
