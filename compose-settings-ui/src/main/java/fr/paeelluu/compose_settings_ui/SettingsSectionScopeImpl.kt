@@ -1015,6 +1015,7 @@ internal class SettingsSectionScopeImpl(
         trailingContent: (@Composable () -> Unit)?,
         enabled: Boolean,
         visible: Boolean,
+        initiallyOpened: Boolean,
         sharedTransitionKey: Any?,
         titleSharedTransitionKey: Any?,
         subtitleSharedTransitionKey: Any?,
@@ -1025,7 +1026,10 @@ internal class SettingsSectionScopeImpl(
             items.add { shape ->
                 val isEnabled = sectionEnabled && enabled
                 val contentAlpha = if (isEnabled) 1f else 0.38f
-                var showDialog by remember { mutableStateOf(false) }
+                var showDialog by remember { mutableStateOf(initiallyOpened) }
+                LaunchedEffect(initiallyOpened) {
+                    showDialog = initiallyOpened
+                }
 
                 SettingsItemBase(
                     title = {
@@ -1483,6 +1487,7 @@ internal class SettingsSectionScopeImpl(
         trailingContent: (@Composable () -> Unit)?,
         enabled: Boolean,
         visible: Boolean,
+        initiallyOpened: Boolean,
         sharedTransitionKey: Any?,
         titleSharedTransitionKey: Any?,
         subtitleSharedTransitionKey: Any?,
@@ -1493,7 +1498,10 @@ internal class SettingsSectionScopeImpl(
             items.add { shape ->
                 val isEnabled = sectionEnabled && enabled
                 val contentAlpha = if (isEnabled) 1f else 0.38f
-                var showSheet by remember { mutableStateOf(false) }
+                var showSheet by remember { mutableStateOf(initiallyOpened) }
+                LaunchedEffect(initiallyOpened) {
+                    showSheet = initiallyOpened
+                }
                 val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
                 val defaultColors = remember {

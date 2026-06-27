@@ -369,6 +369,31 @@ class SettingsItemScreenshots {
     }
 
     @Test
+    fun fullLibraryDemo() {
+        val composeView = ComposeView(paparazzi.context).apply {
+            setContent {
+                var time by remember { mutableStateOf(0L) }
+                LaunchedEffect(Unit) {
+                    val start = System.currentTimeMillis()
+                    while (true) {
+                        time = System.currentTimeMillis() - start
+                        delay(16)
+                    }
+                }
+                FullLibraryDemo(timeMillis = time)
+            }
+        }
+
+        paparazzi.gif(
+            view = composeView,
+            name = "full_demo",
+            start = 0L,
+            end = 55000L,
+            fps = 30
+        )
+    }
+
+    @Test
     fun adaptiveShapesVisual() {
         val composeView = ComposeView(paparazzi.context).apply {
             setContent {

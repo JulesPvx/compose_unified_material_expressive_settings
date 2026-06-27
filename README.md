@@ -72,13 +72,18 @@ For a comprehensive guide, component catalog, and advanced usage examples, pleas
 
 ## Visuals
 
+### Full Library Demo
+![Full Library Demo](https://github.com/JulesPvx/compose_unified_material_expressive_settings/raw/main/docs/assets/full_demo.gif)
+
+*A 15-second overview showing the comprehensive set of components, fluid scrolling, adaptive shapes, and shared transitions.*
+
 ### Adaptive Corner Rounding
-![Adaptive Corner Rounding](https://github.com/JulesPvx/compose_unified_material_expressive_settings/raw/main/docs/assets/adaptive_shapes.png)
+![Adaptive Corner Rounding](https://github.com/JulesPvx/compose_unified_material_expressive_settings/raw/main/docs/assets/adaptive_shapes.gif)
 
 *A 10-15 second recording showing how corners dynamically adjust when items are expanded or grouped, maintaining the expressive container aesthetic.*
 
 ### Shared Element Transitions
-![Shared Element Transitions](https://github.com/JulesPvx/compose_unified_material_expressive_settings/raw/main/docs/assets/shared_transitions.png)
+![Shared Element Transitions](https://github.com/JulesPvx/compose_unified_material_expressive_settings/raw/main/docs/assets/shared_transitions.gif)
 
 *Demonstration of fluid transitions between settings items and detail screens using the built-in Shared Element Transition support.*
 
