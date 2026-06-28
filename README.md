@@ -75,8 +75,19 @@ For a comprehensive guide, component catalog, and advanced usage examples, pleas
 ### Adaptive Corner Rounding
 ![Adaptive Corner Rounding](https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/85db1914f5038847a985248dad5b71ff7cd8f1e3/docs/assets/adaptive_shapes.png)
 
-### Shared Element Transitions
-![Shared Element Transitions](https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/85db1914f5038847a985248dad5b71ff7cd8f1e3/docs/assets/shared_transitions.png)
+<table width="100%">
+  <tr>
+    <td align="center" width="50%">
+      <h3>Shared Element Transitions</h3>
+      <img src="https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/85db1914f5038847a985248dad5b71ff7cd8f1e3/docs/assets/shared_transitions.png" alt="Shared Element Transitions">
+    </td>
+    <td align="center" width="50%">
+      <h3>Full demo</h3>
+      <img src="https://via.placeholder.com/600x400?text=Template+Image" alt="Template Image">
+    </td>
+  </tr>
+</table>
+
 ## License
 
 Licensed under the Apache License, Version 2.0.
