@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 **Using Version Catalogs (Recommended):**
 ```toml
 [versions]
-composeSettings = "1.2.0"
+composeSettings = "1.2.1"
 
 [libraries]
 compose-settings = { module = "io.github.julespvx:compose-settings-ui", version.ref = "composeSettings" }
@@ -34,7 +34,7 @@ compose-settings = { module = "io.github.julespvx:compose-settings-ui", version.
 **Standard Notation:**
 ```kotlin
 dependencies {
-    implementation("io.github.julespvx:compose-settings-ui:1.2.0")
+    implementation("io.github.julespvx:compose-settings-ui:1.2.1")
 }
 ```
 
