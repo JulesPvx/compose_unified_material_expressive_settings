@@ -208,8 +208,8 @@ fun FullLibraryDemo(timeMillis: Long) {
                                     animatedVisibilityScope = this@AnimatedContent
                                 ) {
                                     userProfile(
-                                        name = "Jules Pouvreaux",
-                                        email = "jules@example.com",
+                                        name = "John Doe",
+                                        email = "john@example.com",
                                         avatar = {
                                             Surface(
                                                 shape = CircleShape,
@@ -355,7 +355,7 @@ fun FullLibraryDemo(timeMillis: Long) {
                                 }
                             }
                             Spacer(modifier = Modifier.height(24.dp))
-                            Text("Jules Pouvreaux", style = MaterialTheme.typography.headlineMedium)
+                            Text("John Doe", style = MaterialTheme.typography.headlineMedium)
                             Text("Developer Extraordinaire", style = MaterialTheme.typography.bodyLarge)
                         }
                     }

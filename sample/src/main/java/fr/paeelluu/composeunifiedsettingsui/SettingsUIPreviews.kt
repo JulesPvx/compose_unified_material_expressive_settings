@@ -94,7 +94,7 @@ fun SharedTransitionSamplePreview(initialShowDetails: Boolean = false) {
                                 animatedVisibilityScope = this@AnimatedContent
                             ) {
                                 userProfile(
-                                    name = "Jules Pouvreaux",
+                                    name = "John Doe",
                                     email = "Tap to see transition",
                                     sharedTransitionKey = "profile_card",
                                     avatarSharedTransitionKey = "profile_avatar",
@@ -173,7 +173,7 @@ fun SharedTransitionSamplePreview(initialShowDetails: Boolean = false) {
                                     }
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text(
-                                        text = "Jules Pouvreaux",
+                                        text = "John Doe",
                                         style = MaterialTheme.typography.headlineSmall,
                                         modifier = Modifier.sharedBounds(
                                             rememberSharedContentState(key = "profile_name"),
@@ -181,7 +181,7 @@ fun SharedTransitionSamplePreview(initialShowDetails: Boolean = false) {
                                         )
                                     )
                                     Text(
-                                        text = "jules@example.com",
+                                        text = "john@example.com",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.sharedBounds(
                                             rememberSharedContentState(key = "profile_email"),
@@ -435,8 +435,8 @@ fun FullSettingsScreenPreview() {
                                     titleSharedTransitionKey = "account_section_title"
                                 ) {
                                     userProfile(
-                                        name = "Jules Pouvreaux",
-                                        email = "jules@example.com",
+                                        name = "John Doe",
+                                        email = "john@example.com",
                                         avatar = {
                                             Surface(
                                                 shape = CircleShape,
@@ -602,7 +602,7 @@ fun FullSettingsScreenPreview() {
                                     }
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text(
-                                        text = "Jules Pouvreaux",
+                                        text = "John Doe",
                                         style = MaterialTheme.typography.headlineSmall,
                                         modifier = Modifier.sharedBounds(
                                             rememberSharedContentState(key = "profile_name"),
@@ -610,7 +610,7 @@ fun FullSettingsScreenPreview() {
                                         )
                                     )
                                     Text(
-                                        text = "jules@example.com",
+                                        text = "john@example.com",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.sharedBounds(
                                             rememberSharedContentState(key = "profile_email"),

@@ -7,7 +7,7 @@
  *                    ||                                                                                                         .|....'
  *                   ''''
  *
- * Copyright (c) 2026 Jules Pouvreaux
+ * Copyright (c) 2026 John Doe
  *
  * /home/paeelluu/StudioProjects/compose_unified_material_expressive_settings/sample/src/main/java/fr/paeelluu/composeunifiedsettingsui/DemoComponents.kt
  *
@@ -47,8 +47,8 @@ import fr.paeelluu.compose_settings_ui.SettingsSectionScope
 
 fun SettingsSectionScope.UserProfileSample() {
     userProfile(
-        name = "Jules Pouvreaux",
-        email = "jules@example.com",
+        name = "John Doe",
+        email = "john@example.com",
         onClick = {},
         trailingContent = {
             Surface(
@@ -281,7 +281,7 @@ fun SettingsSectionScope.FullScreenSearchSample(
 }
 
 fun SettingsSectionScope.FooterSample() {
-    footer(text = "Version 1.0.8 (Alpha)\n© 2026 Jules Pouvreaux")
+    footer(text = "Version 1.0.8 (Alpha)\n© 2026 John Doe")
 }
 
 fun SettingsSectionScope.ItemSample() {

@@ -111,7 +111,7 @@ class SettingsItemScreenshots {
         snapshot {
             textField(
                 title = "Display Name",
-                value = "Jules Pouvreaux",
+                value = "John Doe",
                 onValueChange = {},
                 placeholder = "Enter your name"
             )
@@ -190,8 +190,8 @@ class SettingsItemScreenshots {
     fun userProfileItem() {
         snapshot {
             userProfile(
-                name = "Jules Pouvreaux",
-                email = "jules@example.com",
+                name = "John Doe",
+                email = "john@example.com",
                 onClick = {}
             )
         }
