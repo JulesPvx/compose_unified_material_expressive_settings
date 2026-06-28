@@ -83,7 +83,7 @@ For a comprehensive guide, component catalog, and advanced usage examples, pleas
     </td>
     <td align="center" width="50%">
       <h3>Full demo</h3>
-      <img src="https://via.placeholder.com/600x400?text=Template+Image" alt="Template Image">
+      <img src="https://github.com/JulesPvx/compose_unified_material_expressive_settings/blob/63a848d1e680d5f4ba8d474a7795b08bb727f782/docs/assets/full_demo.png" alt="Full demo">
     </td>
   </tr>
 </table>
